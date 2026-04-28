@@ -12,7 +12,13 @@
     ../../modules/nixos/sops.nix
   ];
 
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    # /boot is only 96MB on this host and each generation's initrd is ~50MB.
+    # Keeping more than 2 generations fills the partition.
+    # Long-term fix: repartition /boot to 512MB+. Until then, keep it tight.
+    configurationLimit = 2;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "hydrogen";
