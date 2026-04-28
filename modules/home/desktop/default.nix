@@ -1,0 +1,19 @@
+{ ... }:
+
+{
+  imports = [
+    ./hyprland.nix
+    ./niri.nix
+    ./waybar.nix
+    ./swaync.nix
+    ./fuzzel.nix
+    ./kitty.nix
+    ./hyprlock.nix
+    ./hypridle.nix
+    ./theme-switch.nix
+    ./wlogout.nix
+    ./keybind-help.nix
+    ./system-controls.nix
+    ./gtk-style.nix
+  ];
+}

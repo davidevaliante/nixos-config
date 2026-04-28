@@ -1,0 +1,20 @@
+# sops-nix encryption rules. See docs/sops.md for the full workflow,
+# scripts/sops-bootstrap.sh for an idempotent helper, and the section
+# "Adding a second machine" when you want a new host to decrypt secrets.
+
+keys:
+  - &user_davide age156k286rx49qdkj7fddj8f7gwd92n6r0wunu7260lxcweszfy3evsc7cdap
+  - &host_hydrogen  age19w4ecgrxgnelsdcnn26xfu8mkgrypmuxmgftccu5gt6ug64w3qfqvqdmpz
+
+creation_rules:
+  - path_regex: secrets/common/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *user_davide
+          - *host_hydrogen
+
+  - path_regex: secrets/hosts/hydrogen/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *user_davide
+          - *host_hydrogen
