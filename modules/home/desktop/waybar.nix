@@ -3,7 +3,7 @@
 let
   c = config.lib.stylix.colors.withHashtag;
 in
-{
+lib.mkIf (config.mySystem.desktop.shell == "traditional") {
   stylix.targets.waybar.enable = lib.mkForce false;
 
   programs.waybar = {

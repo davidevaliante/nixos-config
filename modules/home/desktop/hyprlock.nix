@@ -3,7 +3,7 @@
 let
   c = config.lib.stylix.colors;
 in
-{
+lib.mkIf (config.mySystem.desktop.shell == "traditional") {
   programs.hyprlock = {
     enable = true;
 

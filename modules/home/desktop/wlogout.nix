@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, config, lib, ... }:
 
-{
+lib.mkIf (config.mySystem.desktop.shell == "traditional") {
   home.packages = [ pkgs.wlogout ];
 
   xdg.configFile."wlogout/layout".text = ''

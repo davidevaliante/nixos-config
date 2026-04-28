@@ -1,6 +1,6 @@
-{ ... }:
+{ config, lib, ... }:
 
-{
+lib.mkIf (config.mySystem.desktop.shell == "traditional") {
   services.hypridle = {
     enable = true;
 

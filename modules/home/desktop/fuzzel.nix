@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 
-{
+lib.mkIf (config.mySystem.desktop.shell == "traditional") {
   programs.fuzzel = {
     enable = true;
     settings = {

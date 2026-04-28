@@ -22,6 +22,8 @@
     claude-code
   ];
 
+  mySystem.desktop.shell = "noctalia";
+
   programs.home-manager.enable = true;
 
   gtk.gtk4.theme = null;

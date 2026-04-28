@@ -2,11 +2,13 @@
 
 {
   imports = [
+    ./options.nix
     ./hyprland.nix
     ./niri.nix
     ./waybar.nix
     ./swaync.nix
     ./fuzzel.nix
+    ./noctalia-shell.nix
     ./kitty.nix
     ./hyprlock.nix
     ./hypridle.nix
