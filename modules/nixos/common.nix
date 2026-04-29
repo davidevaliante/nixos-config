@@ -43,11 +43,9 @@
 
   # OpenSSH server is enabled so the host has a stable ed25519 host key —
   # sops-nix derives the host's age decryption identity from it via ssh-to-age.
-  # Firewall stays closed by default (port 22 not opened); enable per-host if
-  # remote access is actually wanted.
   services.openssh = {
     enable = true;
-    openFirewall = false;
+    openFirewall = true;
     settings = {
       PasswordAuthentication = false;
       PermitRootLogin = "no";
