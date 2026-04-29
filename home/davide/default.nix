@@ -14,6 +14,7 @@
     ../../modules/home/programs/ssh.nix
     ../../modules/home/programs/fzf.nix
     ../../modules/home/programs/awsp.nix
+    ../../modules/home/programs/kubectl.nix
     ../../modules/home/desktop
   ];
 
