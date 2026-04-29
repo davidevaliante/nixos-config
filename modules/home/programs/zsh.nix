@@ -12,6 +12,8 @@
       rebuild = "nix-switch";
       rebuildup = "nix-switch update";
       rebuildboot = "nix-switch boot";
+      zz = "cd ..";
+      zzz = "cd ../..";
     };
 
     history = {
