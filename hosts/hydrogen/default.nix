@@ -10,6 +10,7 @@
     ../../modules/nixos/desktops/niri.nix
     ../../modules/nixos/stylix.nix
     ../../modules/nixos/sops.nix
+    ../../modules/nixos/aws.nix
   ];
 
   boot.loader.systemd-boot = {

@@ -12,6 +12,8 @@
     ../../modules/home/programs/direnv.nix
     ../../modules/home/programs/nix-switch.nix
     ../../modules/home/programs/ssh.nix
+    ../../modules/home/programs/fzf.nix
+    ../../modules/home/programs/awsp.nix
     ../../modules/home/desktop
   ];
 
@@ -32,6 +34,8 @@
     corepack_24 # activates pnpm/yarn versions pinned in package.json's packageManager field
     go
     rustup
+
+    awscli2
   ];
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
