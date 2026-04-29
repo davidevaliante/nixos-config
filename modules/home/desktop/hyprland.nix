@@ -77,7 +77,7 @@ in
       "$mod" = "SUPER";
       "$terminal" = "kitty";
       "$launcher" = "fuzzel";
-      "$browser" = "firefox";
+      "$browser" = "google-chrome-stable";
 
       exec-once = [
         "${pkgs.awww}/bin/awww-daemon"

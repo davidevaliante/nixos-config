@@ -12,7 +12,7 @@ in
 {
   programs.niri.settings.binds = {
     "Mod+Return".action.spawn = [ "kitty" ];
-    "Mod+B".action.spawn = [ "firefox" ];
+    "Mod+B".action.spawn = [ "google-chrome-stable" ];
     "Mod+Space".action.spawn = launcherSpawn;
     "Mod+Q".action.close-window = [ ];
     "Mod+Shift+Q".action.quit = [ ];

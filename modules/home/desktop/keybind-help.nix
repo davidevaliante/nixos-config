@@ -3,7 +3,7 @@
 let
   binds = [
     "Super+Return            kitty terminal"
-    "Super+B                 firefox"
+    "Super+B                 google chrome"
     "Super+Space             fuzzel app launcher"
     "Super+T                 theme switcher"
     "Super+N                 swaync panel toggle"
