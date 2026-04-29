@@ -26,8 +26,10 @@
     # Dev toolchains. nvm/fnm are intentionally excluded — they ship glibc Node
     # binaries that can't run on NixOS. Per-project version pinning is handled
     # via flake.nix + nix-direnv, not these globals.
-    nodejs_22
-    corepack_22 # activates pnpm/yarn versions pinned in package.json's packageManager field
+    # Match claude-code's Node version (it ships nodejs_24 as a runtime dep);
+    # mismatched majors collide on `include/node/common.gypi` in buildEnv.
+    nodejs_24
+    corepack_24 # activates pnpm/yarn versions pinned in package.json's packageManager field
     go
     rustup
   ];
