@@ -43,7 +43,8 @@ in
     # ── Formatters (conform.nvim) ──
     stylua
     prettierd
-    rustfmt                               # ships with rustup if installed; bare here is fine
+    # rustfmt comes from rustup (installed globally); installing it standalone
+    # collides on `bin/cargo-fmt` in the user env.
     gofumpt
     # gotools dropped: gopls already provides modernize/goimports
 
