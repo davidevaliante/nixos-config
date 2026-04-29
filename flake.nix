@@ -12,6 +12,11 @@
     # specific kubectl minor (skew rules); current nixpkgs ships 1.35.x.
     nixpkgs-kubectl.url = "github:NixOS/nixpkgs/ebe4301cbd8f81c4f8d3244b3632338bbeb6d49c";
 
+    # Pinned to a nixos-25.05 commit that ships opentofu 1.9.1. Current
+    # nixpkgs ships 1.11.x; state files and provider versions are tied to a
+    # specific tofu minor.
+    nixpkgs-opentofu.url = "github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
