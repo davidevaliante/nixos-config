@@ -5,6 +5,6 @@
   # For projects that need a different minor, ship a local flake.nix +
   # `.envrc` (`use flake`) — direnv will swap kubectl on cd.
   home.packages = [
-    inputs.nixpkgs-kubectl.legacyPackages.${pkgs.system}.kubectl
+    inputs.nixpkgs-kubectl.legacyPackages.${pkgs.stdenv.hostPlatform.system}.kubectl
   ];
 }
