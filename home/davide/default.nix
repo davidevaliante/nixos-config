@@ -22,6 +22,14 @@
     claude-code
     slack
     google-chrome
+
+    # Dev toolchains. nvm/fnm are intentionally excluded — they ship glibc Node
+    # binaries that can't run on NixOS. Per-project version pinning is handled
+    # via flake.nix + nix-direnv, not these globals.
+    nodejs_22
+    corepack_22 # activates pnpm/yarn versions pinned in package.json's packageManager field
+    go
+    rustup
   ];
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
