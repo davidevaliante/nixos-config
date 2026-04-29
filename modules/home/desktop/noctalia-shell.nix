@@ -11,6 +11,11 @@ in
     enable = true;
 
     settings = {
+      # `useSeparateOpacity` decouples the bar's opacity from
+      # `ui.panelBackgroundOpacity` (which stylix forces to 1.0 to keep
+      # popups readable). Without this flag, `bar.backgroundOpacity` is
+      # silently ignored and the bar inherits the panel opacity.
+      bar.useSeparateOpacity = lib.mkForce true;
       bar.backgroundOpacity = lib.mkForce 0.0;
       ui.fontDefault = lib.mkForce "0xProto Nerd Font";
       colorSchemes = {
