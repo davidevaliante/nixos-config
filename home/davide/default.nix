@@ -16,6 +16,8 @@
     ../../modules/home/programs/awsp.nix
     ../../modules/home/programs/kubectl.nix
     ../../modules/home/programs/opentofu.nix
+    ../../modules/home/programs/kubeconfig.nix
+    ../../modules/home/programs/bootstrap.nix
     ../../modules/home/desktop
   ];
 
