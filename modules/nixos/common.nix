@@ -47,6 +47,7 @@
     enable = true;
     openFirewall = true;
     settings = {
+      # Flip to `true` temporarily to seed a new client's pubkey via ssh-copy-id, then revert.
       PasswordAuthentication = false;
       PermitRootLogin = "no";
     };
