@@ -1,9 +1,15 @@
 { pkgs, ... }:
 
 let
+  # `nixos-rebuild` is intentionally NOT in runtimeInputs and is invoked via
+  # the stable `/run/current-system/sw/bin/...` path. runtimeInputs would
+  # prepend a versioned `/nix/store/...-nixos-rebuild-ng-XX/bin` to PATH;
+  # sudo then resolves the command to that store path and the NOPASSWD rule
+  # (which matches /run/current-system/sw/bin/nixos-rebuild) silently misses,
+  # so every rebuild prompts for a password.
   nixSwitch = pkgs.writeShellApplication {
     name = "nix-switch";
-    runtimeInputs = with pkgs; [ nixos-rebuild git nix ];
+    runtimeInputs = with pkgs; [ nix ];
     text = ''
       REPO="''${NIX_SWITCH_REPO:-$HOME/nixos-config}"
       HOST="$(cat /etc/hostname | tr -d '[:space:]')"
@@ -37,7 +43,7 @@ EOF
       fi
 
       echo ">>> nixos-rebuild $MODE  (host=$HOST)"
-      sudo nixos-rebuild "$MODE" --flake "$REPO#$HOST" --no-update-lock-file
+      sudo /run/current-system/sw/bin/nixos-rebuild "$MODE" --flake "$REPO#$HOST" --no-update-lock-file
     '';
   };
 in
