@@ -44,12 +44,19 @@ in
   # Ship plugins straight from the noctalia-plugins flake input
   # (single-source-of-truth for plugin code), plus the custom Oxocarbon
   # colorscheme (noctalia scans this dir with `find -L`, so symlinks work).
+  # `recursive = true` keeps the plugin directory a real, writable folder
+  # (each file inside is its own symlink) so noctalia can persist per-plugin
+  # settings.json. With a single dir-level symlink to the read-only store,
+  # plugins like keybind-cheatsheet hang on "loading" because their cache
+  # write fails.
   xdg.configFile."noctalia/plugins/keybind-cheatsheet" = lib.mkIf active {
     source = "${inputs.noctalia-plugins}/keybind-cheatsheet";
+    recursive = true;
   };
 
   xdg.configFile."noctalia/plugins/screen-toolkit" = lib.mkIf active {
     source = "${inputs.noctalia-plugins}/screen-toolkit";
+    recursive = true;
   };
 
   xdg.configFile."noctalia/colorschemes/Oxocarbon/Oxocarbon.json" = lib.mkIf active {
