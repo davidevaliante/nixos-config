@@ -22,20 +22,15 @@ in
       window_padding_width = "0 8";
       placement_strategy = "center";
 
-      # ── Tab bar (mirror wezterm) ──
+      # ── Tab bar ──
       tab_bar_edge = "bottom";
-      tab_bar_style = "powerline";
+      tab_bar_style = "separator";   # flat & minimal; alternatives: fade, powerline
       tab_bar_min_tabs = 2;          # hide when only 1 tab (wezterm equivalent)
-      tab_powerline_style = "slanted";
-
-      # Highlight the active tab (stylix doesn't set these by default).
-      # base0D = accent blue, base00 = bg → bright contrast on the active tab.
-      active_tab_foreground   = lib.mkForce "#${c.base00}";
-      active_tab_background   = lib.mkForce "#${c.base0D}";
+      tab_separator = " ┇ ";
       active_tab_font_style   = "bold";
-      inactive_tab_foreground = lib.mkForce "#${c.base04}";
-      inactive_tab_background = lib.mkForce "#${c.base01}";
       inactive_tab_font_style = "normal";
+      # NOTE: tab colors are set in `extraConfig` below — same stylix
+      # include-overrides-settings issue as `cursor`.
 
       # ── Cursor ──
       cursor_shape = "block";
@@ -63,8 +58,12 @@ in
     # ensures it's the last block in kitty.conf so the cursor override
     # actually wins.
     extraConfig = lib.mkAfter ''
-      cursor            #${c.base09}
-      cursor_text_color #${c.base00}
+      cursor                  #${c.base09}
+      cursor_text_color       #${c.base00}
+      active_tab_foreground   #${c.base00}
+      active_tab_background   #${c.base0D}
+      inactive_tab_foreground #${c.base04}
+      inactive_tab_background #${c.base01}
     '';
   };
 }
