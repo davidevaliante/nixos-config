@@ -41,6 +41,11 @@ in
       cursor_shape = "block";
       cursor_blink_interval = 0;     # don't blink — matches wezterm default
       shell_integration = "enabled";
+      # NOTE: cursor is set in `extraConfig` below, NOT here. Stylix
+      # appends a base16 color file via `include` *after* programs.kitty
+      # settings, so anything set here for `cursor` gets overridden by
+      # stylix's `cursor #<foreground>` (white). extraConfig + mkAfter
+      # lands after the include.
 
       # ── Misc QoL ──
       copy_on_select = "no";
@@ -53,5 +58,13 @@ in
       "ctrl+shift+v" = "paste_from_clipboard";
       "ctrl+shift+c" = "copy_to_clipboard";
     };
+
+    # Must come after stylix's `include base16-...conf` line; mkAfter
+    # ensures it's the last block in kitty.conf so the cursor override
+    # actually wins.
+    extraConfig = lib.mkAfter ''
+      cursor            #${c.base09}
+      cursor_text_color #${c.base00}
+    '';
   };
 }
