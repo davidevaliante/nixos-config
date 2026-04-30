@@ -47,6 +47,12 @@
         ];
         open-maximized = true;
       }
+      {
+        matches = [ { app-id = "^kitty-floating$"; } ];
+        open-floating = true;
+        default-column-width = { fixed = 1000; };
+        default-window-height = { fixed = 600; };
+      }
     ];
 
     spawn-at-startup = [

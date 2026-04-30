@@ -16,7 +16,8 @@ in
     "Mod+Escape"   = { action.spawn = cmds.lock;                   hotkey-overlay.title = "Lock screen"; };
     "Mod+Alt+L"    = { action.spawn = cmds.lock;                   hotkey-overlay.title = "Lock screen"; };
     "Mod+N"        = { action.spawn = cmds.notify;                 hotkey-overlay.title = "Notification history"; };
-    "Mod+T"        = { action.spawn = [ "theme-switch" ];          hotkey-overlay.title = "Switch theme"; };
+    "Mod+T"        = { action.spawn = [ "kitty" "--class" "kitty-floating" ]; hotkey-overlay.title = "Floating terminal"; };
+    "Mod+Shift+T"  = { action.spawn = [ "theme-switch" ];                     hotkey-overlay.title = "Switch theme"; };
     "Mod+Shift+E"  = { action.spawn = cmds.session;                hotkey-overlay.title = "Session menu"; };
     "Mod+Slash"    = { action.spawn = cmds.cheatsheet;             hotkey-overlay.title = "Keybind cheatsheet"; };
     "Mod+O"        = { action.toggle-overview = [ ];               hotkey-overlay.title = "Toggle overview"; };
