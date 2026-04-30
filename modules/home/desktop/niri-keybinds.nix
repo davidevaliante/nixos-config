@@ -25,6 +25,8 @@ in
 
     "Mod+H".action.focus-column-left = [ ];
     "Mod+L".action.focus-column-right = [ ];
+    "Mod+Tab".action.focus-column-right-or-first = [ ];
+    "Mod+Shift+Tab".action.focus-column-left-or-last = [ ];
     "Mod+J".action.focus-window-down = [ ];
     "Mod+K".action.focus-window-up = [ ];
 
