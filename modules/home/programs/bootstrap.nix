@@ -16,7 +16,7 @@ let
       # 1. Sanity check — sops should have decrypted AWS creds at boot.
       if [ ! -r "$HOME/.aws/credentials" ]; then
         echo "!! ~/.aws/credentials missing — sops-nix didn't activate. Aborting."
-        echo "   (Run `sudo nixos-rebuild switch` first, then re-run bootstrap.)"
+        echo "   (Run 'sudo nixos-rebuild switch' first, then re-run bootstrap.)"
         exit 1
       fi
       echo ">>> AWS creds present"
