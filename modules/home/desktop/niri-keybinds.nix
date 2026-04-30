@@ -8,6 +8,7 @@ let
   lockSpawn       = if isNoctalia then [ "noctalia-shell" "ipc" "call" "lockScreen" "lock" ]                          else [ "hyprlock" ];
   sessionSpawn    = if isNoctalia then [ "noctalia-shell" "ipc" "call" "sessionMenu" "toggle" ]                       else [ "wlogout" ];
   cheatsheetSpawn = if isNoctalia then [ "noctalia-shell" "ipc" "call" "plugin" "togglePanel" "keybind-cheatsheet" ]  else [ "keybind-help" ];
+  windowSwitchSpawn = if isNoctalia then [ "noctalia-shell" "ipc" "call" "launcher" "windows" ]                     else [ "niri-window-switcher" ];
 
   screenshotRegion = "grim -g \"$(slurp)\" - | satty --filename - --output-filename ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png --copy-command wl-copy";
   screenshotFull   = "grim - | satty --filename - --output-filename ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png --copy-command wl-copy";
@@ -26,7 +27,7 @@ in
     "Mod+Shift+E"  = { action.spawn = sessionSpawn;                hotkey-overlay.title = "Session menu"; };
     "Mod+Slash"    = { action.spawn = cheatsheetSpawn;             hotkey-overlay.title = "Keybind cheatsheet"; };
     "Mod+O"        = { action.toggle-overview = [ ];               hotkey-overlay.title = "Toggle overview"; };
-    "Mod+G"        = { action.spawn = [ "niri-window-switcher" ];  hotkey-overlay.title = "Find window"; };
+    "Mod+G"        = { action.spawn = windowSwitchSpawn;           hotkey-overlay.title = "Find window"; };
 
     "Mod+H"          = { action.focus-column-left = [ ];           hotkey-overlay.title = "Focus column left"; };
     "Mod+L"          = { action.focus-column-right = [ ];          hotkey-overlay.title = "Focus column right"; };
