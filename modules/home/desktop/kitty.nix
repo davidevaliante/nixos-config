@@ -41,6 +41,11 @@ in
       tab_bar_style = "fade";        # color fade between tabs; flat when bgs match
       tab_bar_min_tabs = 2;          # hide when only 1 tab
       tab_fade = "1 1 1 1";          # uniform fade weights so colors don't gradient
+      # Python format-spec on the template enforces a min width: {title:^14}
+      # centers in 14 chars, padding short titles like `~` with spaces while
+      # still expanding for longer paths. No truncation — kitty handles that
+      # via tab_title_max_length if needed.
+      tab_title_template = "{title:^14}";
       active_tab_font_style   = "bold";
       inactive_tab_font_style = "normal";
       # NOTE: tab colors are set in `extraConfig` below — same stylix
