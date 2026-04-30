@@ -29,6 +29,8 @@ in
     bind = $mod, F, fullscreen, 0 #"Toggle fullscreen"
     bind = $mod, P, pseudo, #"Toggle pseudo"
     bind = $mod, J, togglesplit, #"Toggle split direction"
+    bind = $mod SHIFT, M, movetoworkspacesilent, special:stash #"Stash window"
+    bind = $mod, M, togglespecialworkspace, stash #"Toggle stash"
 
     # 3. Window Focus
     bind = $mod, h, movefocus, l #"Focus left"
