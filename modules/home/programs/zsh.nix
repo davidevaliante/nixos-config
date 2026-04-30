@@ -9,13 +9,10 @@
     historySubstringSearch.enable = true;
 
     shellAliases = {
-      # `nh` wraps nixos-rebuild with colored phase output and an
-      # automatic generation diff via nvd. NH_FLAKE is set by
-      # programs.nh.flake, so no --flake needed.
-      rebuild     = "nh os switch";
-      rebuildup   = "nh os switch -u";        # also update flake.lock
-      rebuildboot = "nh os boot";             # apply on next boot
-      rebuilddry  = "nh os build";            # build only, no activation
+      rebuild     = "sudo nixos-rebuild switch --flake /home/davide/nixos-config#hydrogen";
+      rebuildup   = "sudo nix flake update --flake /home/davide/nixos-config && sudo nixos-rebuild switch --flake /home/davide/nixos-config#hydrogen";
+      rebuildboot = "sudo nixos-rebuild boot --flake /home/davide/nixos-config#hydrogen";
+      rebuilddry  = "sudo nixos-rebuild build --flake /home/davide/nixos-config#hydrogen";
       zz = "cd ..";
       zzz = "cd ../..";
     };

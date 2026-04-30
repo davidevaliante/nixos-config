@@ -31,7 +31,7 @@
     slack
     google-chrome
     apidog
-    nvd          # diff between two NixOS generations (nh shells out to it)
+    nvd          # diff between two NixOS generations
 
     # Dev toolchains. nvm/fnm are intentionally excluded — they ship glibc Node
     # binaries that can't run on NixOS. Per-project version pinning is handled
@@ -47,14 +47,6 @@
   ];
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
-
-  # Pretty wrapper around nixos-rebuild with phase progress + a generation
-  # diff. The `flake` option exports NH_FLAKE so commands like `nh os switch`
-  # work without an explicit --flake argument.
-  programs.nh = {
-    enable = true;
-    flake = "/home/davide/nixos-config";
-  };
 
   xdg.mimeApps = {
     enable = true;
