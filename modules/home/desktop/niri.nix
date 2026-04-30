@@ -31,6 +31,15 @@
       focus-ring.enable = false;
     };
 
+    window-rules = [
+      {
+        geometry-corner-radius =
+          let r = 8.0; in
+          { top-left = r; top-right = r; bottom-left = r; bottom-right = r; };
+        clip-to-geometry = true;
+      }
+    ];
+
     spawn-at-startup = [
       { command = [ "${pkgs.awww}/bin/awww-daemon" ]; }
       { command = [ "sh" "-c" "sleep 1 && ${pkgs.awww}/bin/awww img ${osConfig.stylix.image}" ]; }
