@@ -1,6 +1,10 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, ... }:
 
-lib.mkIf (config.mySystem.desktop.shell == "traditional") {
+{
+  # Fuzzel is always enabled (themed via stylix) so ad-hoc prompts in helper
+  # scripts like `niri-workspace-rename` look consistent. On the noctalia
+  # shell, the launcher itself is noctalia's panel — fuzzel is only the
+  # fallback / generic prompt.
   programs.fuzzel = {
     enable = true;
     settings = {

@@ -6,6 +6,7 @@
     ./hyprland.nix
     ./niri.nix
     ./niri-window-switcher.nix
+    ./niri-workspace-rename.nix
     ./waybar.nix
     ./swaync.nix
     ./fuzzel.nix

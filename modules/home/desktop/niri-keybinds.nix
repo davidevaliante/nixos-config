@@ -28,6 +28,7 @@ in
     "Mod+Slash"    = { action.spawn = cheatsheetSpawn;             hotkey-overlay.title = "Keybind cheatsheet"; };
     "Mod+O"        = { action.toggle-overview = [ ];               hotkey-overlay.title = "Toggle overview"; };
     "Mod+G"        = { action.spawn = windowSwitchSpawn;           hotkey-overlay.title = "Find window"; };
+    "Mod+Comma"    = { action.spawn = [ "niri-workspace-rename" ]; hotkey-overlay.title = "Rename workspace"; };
 
     "Mod+H"          = { action.focus-column-left = [ ];           hotkey-overlay.title = "Focus column left"; };
     "Mod+L"          = { action.focus-column-right = [ ];          hotkey-overlay.title = "Focus column right"; };
