@@ -22,7 +22,9 @@
       ignoreDups = true;
       ignoreSpace = true;
       share = true;
-      path = "$HOME/.zsh_history";
+      # `path` is set centrally in xdg-cleanup.nix to land under
+      # XDG_STATE_HOME — keeping the value here would split the source of
+      # truth.
     };
 
     initContent = ''
