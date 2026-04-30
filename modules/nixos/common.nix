@@ -47,10 +47,24 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    # Many BLE devices (modern headphones included) only advertise their
-    # friendly name via experimental GATT features; without this flag bluez
-    # falls back to showing the MAC address.
-    settings.General.Experimental = true;
+    # Modern headphones advertise mostly over BLE; the friendly name lives
+    # in the *scan-response* packet, not the initial advertisement, so it
+    # only resolves with a long-enough LE scan window. Combined with bluez's
+    # default `[GATT] Cache = always` (which caches the empty-name first
+    # response), devices can stick at "MAC only" forever. The settings
+    # below open scan params, switch the cache to "yes" (only stores
+    # confirmed entries), and enable the LE-friendly flags.
+    settings = {
+      General = {
+        Experimental = true;
+        JustWorksRepairing = "always";
+        FastConnectable = true;
+        Privacy = "device";
+        ControllerMode = "dual";
+      };
+      Policy.AutoEnable = true;
+      GATT.Cache = "yes";
+    };
   };
 
   # OpenSSH server is enabled so the host has a stable ed25519 host key —
