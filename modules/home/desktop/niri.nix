@@ -39,6 +39,14 @@
           { top-left = r; top-right = r; bottom-left = r; bottom-right = r; };
         clip-to-geometry = true;
       }
+      {
+        matches = [
+          { app-id = "^kitty$"; }
+          { app-id = "^google-chrome$"; }
+          { app-id = "^Slack$"; }
+        ];
+        open-maximized = true;
+      }
     ];
 
     spawn-at-startup = [
