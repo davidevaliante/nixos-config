@@ -26,7 +26,7 @@
       default-column-width.proportion = 0.5;
       border = {
         enable = true;
-        width = 2;
+        width = 4;
       };
       focus-ring.enable = false;
     };
