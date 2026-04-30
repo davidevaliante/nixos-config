@@ -11,8 +11,11 @@
       add_newline = false;
 
       character = {
-        success_symbol = "λ";
-        error_symbol = "✗";
+        # Stylix sets up a `base16` palette in starship, so we can reference
+        # theme colors by name. base09 = Oxocarbon pink (matches cursor),
+        # base08 = red for error symbol.
+        success_symbol = "[λ](bold base09)";
+        error_symbol = "[✗](bold base08)";
       };
 
       directory = {

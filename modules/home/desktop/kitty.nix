@@ -24,9 +24,9 @@ in
 
       # ── Tab bar ──
       tab_bar_edge = "bottom";
-      tab_bar_style = "separator";   # flat & minimal; alternatives: fade, powerline
-      tab_bar_min_tabs = 2;          # hide when only 1 tab (wezterm equivalent)
-      tab_separator = " ┇ ";
+      tab_bar_style = "separator";   # text-only, no shape
+      tab_bar_min_tabs = 2;          # hide when only 1 tab
+      tab_separator = "  ";          # plain spaces — no visible separator
       active_tab_font_style   = "bold";
       inactive_tab_font_style = "normal";
       # NOTE: tab colors are set in `extraConfig` below — same stylix
@@ -60,10 +60,12 @@ in
     extraConfig = lib.mkAfter ''
       cursor                  #${c.base09}
       cursor_text_color       #${c.base00}
-      active_tab_foreground   #${c.base00}
-      active_tab_background   #${c.base0D}
-      inactive_tab_foreground #${c.base04}
-      inactive_tab_background #${c.base01}
+      # Active tab = colored text (pink), inactive = muted gray.
+      # Both backgrounds match the terminal bg so no pill/box is drawn.
+      active_tab_foreground   #${c.base09}
+      active_tab_background   #${c.base00}
+      inactive_tab_foreground #${c.base03}
+      inactive_tab_background #${c.base00}
     '';
   };
 }
