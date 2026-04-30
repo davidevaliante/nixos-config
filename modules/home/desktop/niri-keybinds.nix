@@ -30,8 +30,8 @@ in
     "Mod+L"          = { action.focus-column-right = [ ];          hotkey-overlay.title = "Focus column right"; };
     "Mod+J"          = { action.focus-window-down = [ ];           hotkey-overlay.title = "Focus window down"; };
     "Mod+K"          = { action.focus-window-up = [ ];             hotkey-overlay.title = "Focus window up"; };
-    "Mod+Tab"        = { action.focus-column-right-or-first = [ ]; hotkey-overlay.title = "Cycle columns forward"; };
-    "Mod+Shift+Tab"  = { action.focus-column-left-or-last = [ ];   hotkey-overlay.title = "Cycle columns backward"; };
+    "Alt+Tab"        = { action.focus-column-right-or-first = [ ]; hotkey-overlay.title = "Cycle columns forward"; };
+    "Alt+Shift+Tab"  = { action.focus-column-left-or-last = [ ];   hotkey-overlay.title = "Cycle columns backward"; };
 
     "Mod+Shift+H"  = { action.move-column-left = [ ];   hotkey-overlay.title = "Move column left"; };
     "Mod+Shift+L"  = { action.move-column-right = [ ];  hotkey-overlay.title = "Move column right"; };
