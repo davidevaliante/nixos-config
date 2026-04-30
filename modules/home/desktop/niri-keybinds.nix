@@ -26,6 +26,7 @@ in
     "Mod+Shift+E"  = { action.spawn = sessionSpawn;                hotkey-overlay.title = "Session menu"; };
     "Mod+Slash"    = { action.spawn = cheatsheetSpawn;             hotkey-overlay.title = "Keybind cheatsheet"; };
     "Mod+O"        = { action.toggle-overview = [ ];               hotkey-overlay.title = "Toggle overview"; };
+    "Mod+G"        = { action.spawn = [ "niri-window-switcher" ];  hotkey-overlay.title = "Find window"; };
 
     "Mod+H"          = { action.focus-column-left = [ ];           hotkey-overlay.title = "Focus column left"; };
     "Mod+L"          = { action.focus-column-right = [ ];          hotkey-overlay.title = "Focus column right"; };
