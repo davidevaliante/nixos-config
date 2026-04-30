@@ -30,6 +30,7 @@ in
         }
         { id = "Battery"; }
         { id = "Volume"; }
+        { id = "Bluetooth"; }
         { id = "Brightness"; }
         { id = "ControlCenter"; }
       ];

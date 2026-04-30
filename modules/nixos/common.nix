@@ -41,6 +41,14 @@
 
   networking.networkmanager.enable = true;
 
+  # Bluetooth — pipewire handles audio routing for BT headphones automatically
+  # (LDAC/AAC/aptX work on modern wireplumber). Pairing happens via noctalia's
+  # bluetooth panel; no `blueman` GUI needed.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
   # OpenSSH server is enabled so the host has a stable ed25519 host key —
   # sops-nix derives the host's age decryption identity from it via ssh-to-age.
   services.openssh = {

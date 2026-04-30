@@ -18,6 +18,7 @@
     ../../modules/home/programs/opentofu.nix
     ../../modules/home/programs/kubeconfig.nix
     ../../modules/home/programs/bootstrap.nix
+    ../../modules/home/programs/obs.nix
     ../../modules/home/desktop
   ];
 
