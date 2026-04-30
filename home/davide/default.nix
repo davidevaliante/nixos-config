@@ -54,6 +54,7 @@
       "x-scheme-handler/https" = "google-chrome.desktop";
       "x-scheme-handler/about" = "google-chrome.desktop";
       "x-scheme-handler/unknown" = "google-chrome.desktop";
+      "x-scheme-handler/apidog" = "apidog.desktop";
     };
   };
 
@@ -68,6 +69,10 @@
     type = "Application";
     startupNotify = true;
     categories = [ "Development" "Network" ];
+    # Required for OAuth callback (apidog://...) to route from Chrome back
+    # into the running Apidog instance.
+    mimeType = [ "x-scheme-handler/apidog" ];
+    settings.StartupWMClass = "Apidog";
   };
 
   mySystem.desktop.shell = "noctalia";
