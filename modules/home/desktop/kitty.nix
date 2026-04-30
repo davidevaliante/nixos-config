@@ -38,9 +38,9 @@ in
 
       # ── Tab bar ──
       tab_bar_edge = "bottom";
-      tab_bar_style = "separator";   # text-only, no shape
+      tab_bar_style = "fade";        # color fade between tabs; flat when bgs match
       tab_bar_min_tabs = 2;          # hide when only 1 tab
-      tab_separator = "  ";          # plain spaces — no visible separator
+      tab_fade = "1 1 1 1";          # uniform fade weights so colors don't gradient
       active_tab_font_style   = "bold";
       inactive_tab_font_style = "normal";
       # NOTE: tab colors are set in `extraConfig` below — same stylix
