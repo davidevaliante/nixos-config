@@ -17,6 +17,17 @@ in
       # silently ignored and the bar inherits the panel opacity.
       bar.useSeparateOpacity = lib.mkForce true;
       bar.backgroundOpacity = lib.mkForce 0.0;
+      # VPN isn't in the default right-widget list; adding it surfaces the
+      # NetworkManager VPN toggle next to Tray/NotificationHistory.
+      bar.widgets.right = lib.mkForce [
+        { id = "Tray"; }
+        { id = "NotificationHistory"; }
+        { id = "VPN"; }
+        { id = "Battery"; }
+        { id = "Volume"; }
+        { id = "Brightness"; }
+        { id = "ControlCenter"; }
+      ];
       ui.fontDefault = lib.mkForce "0xProto Nerd Font";
       colorSchemes = {
         useWallpaperColors = false;
