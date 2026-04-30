@@ -56,6 +56,19 @@
     };
   };
 
+  # The apidog nixpkgs package ships the binary + icon but no .desktop
+  # entry, so launchers (fuzzel, etc.) can't see it. Provide one ourselves.
+  xdg.desktopEntries.apidog = {
+    name = "Apidog";
+    genericName = "API Client";
+    comment = "All-in-one API design, test, mock and documentation platform";
+    exec = "apidog %U";
+    icon = "apidog";
+    type = "Application";
+    startupNotify = true;
+    categories = [ "Development" "Network" ];
+  };
+
   mySystem.desktop.shell = "noctalia";
 
   programs.home-manager.enable = true;
