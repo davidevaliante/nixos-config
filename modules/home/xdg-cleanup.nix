@@ -12,8 +12,9 @@ in
   xdg.enable = true;
 
   # Move zsh dotfiles into ~/.config/zsh; HISTFILE goes under XDG_STATE_HOME
-  # so the history isn't mixed with config.
-  programs.zsh.dotDir = ".config/zsh";
+  # so the history isn't mixed with config. dotDir wants an absolute path
+  # — relative is deprecated in newer home-manager.
+  programs.zsh.dotDir = "${xdgConfig}/zsh";
   programs.zsh.history.path = "${xdgState}/zsh/history";
 
   # GTK2 — home-manager's gtk2 module owns GTK2_RC_FILES; setting this option
