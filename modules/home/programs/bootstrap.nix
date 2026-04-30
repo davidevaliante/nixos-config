@@ -8,7 +8,7 @@ let
   # shims).
   bootstrap = pkgs.writeShellApplication {
     name = "bootstrap";
-    runtimeInputs = [ pkgs.coreutils ];
+    runtimeInputs = [ pkgs.coreutils pkgs.networkmanager ];
     text = ''
       set -u
       echo "=== bootstrap: post-install setup ==="
@@ -39,6 +39,25 @@ let
       corepack enable --install-directory "$HOME/.local/bin" 2>/dev/null \
         || corepack enable 2>/dev/null \
         || echo "!! corepack enable failed (continuing — pnpm via 'corepack pnpm' still works)"
+
+      # 5. Import OpenVPN profiles into NetworkManager. sops decrypts the
+      #    .ovpn files into /run/secrets/ at boot; we just need to register
+      #    them with NM the first time. Skip if already imported.
+      echo ">>> import OpenVPN profiles"
+      for ovpn in /run/secrets/openvpn-*.ovpn; do
+        [ -r "$ovpn" ] || continue
+        name=$(basename "$ovpn" .ovpn)   # e.g. openvpn-tg-prod
+        if nmcli -t -f NAME connection show 2>/dev/null | grep -qx "$name"; then
+          echo "    $name already imported"
+        else
+          echo "    importing $name"
+          nmcli connection import type openvpn file "$ovpn" \
+            || echo "    !! import of $name failed (continuing)"
+          # `import` derives the connection name from the filename
+          # (e.g. `openvpn-tg-prod`); that lines up with our existence
+          # check above.
+        fi
+      done
 
       echo "=== bootstrap done ==="
     '';

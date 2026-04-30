@@ -11,6 +11,7 @@
     ../../modules/nixos/stylix.nix
     ../../modules/nixos/sops.nix
     ../../modules/nixos/aws.nix
+    ../../modules/nixos/openvpn.nix
   ];
 
   boot.loader.systemd-boot = {
