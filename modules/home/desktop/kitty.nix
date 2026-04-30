@@ -6,6 +6,21 @@ in
 {
   home.packages = with pkgs; [ nerd-fonts._0xproto ];
 
+  # Replace the cat icon with a generic terminal glyph from the active icon
+  # theme. User-level desktop entries override the kitty package's own.
+  xdg.desktopEntries.kitty = {
+    name = "kitty";
+    genericName = "Terminal emulator";
+    comment = "Fast, feature-rich, GPU based terminal";
+    exec = "kitty";
+    tryExec = "kitty";
+    icon = "utilities-terminal";
+    terminal = false;
+    type = "Application";
+    startupNotify = true;
+    categories = [ "System" "TerminalEmulator" ];
+  };
+
   programs.kitty = {
     enable = true;
 
@@ -60,12 +75,17 @@ in
     extraConfig = lib.mkAfter ''
       cursor                  #${c.base09}
       cursor_text_color       #${c.base00}
-      # Active tab = colored text (pink), inactive = muted gray.
-      # Both backgrounds match the terminal bg so no pill/box is drawn.
-      active_tab_foreground   #${c.base09}
+      # Active tab = green text, inactive = muted gray.
+      # All three backgrounds (active cell, inactive cell, tab-bar gutter)
+      # are pinned to the terminal bg so the tab area is visually flat —
+      # otherwise stylix's defaults leave the tab_bar_background slightly
+      # different from the per-tab backgrounds.
+      active_tab_foreground   #${c.base0B}
       active_tab_background   #${c.base00}
       inactive_tab_foreground #${c.base03}
       inactive_tab_background #${c.base00}
+      tab_bar_background      #${c.base00}
+      tab_bar_margin_color    #${c.base00}
     '';
   };
 }
