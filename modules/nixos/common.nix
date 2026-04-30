@@ -47,6 +47,10 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+    # Many BLE devices (modern headphones included) only advertise their
+    # friendly name via experimental GATT features; without this flag bluez
+    # falls back to showing the MAC address.
+    settings.General.Experimental = true;
   };
 
   # OpenSSH server is enabled so the host has a stable ed25519 host key —
