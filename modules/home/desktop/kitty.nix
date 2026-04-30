@@ -13,7 +13,6 @@ in
     genericName = "Terminal emulator";
     comment = "Fast, feature-rich, GPU based terminal";
     exec = "kitty";
-    tryExec = "kitty";
     icon = "utilities-terminal";
     terminal = false;
     type = "Application";
