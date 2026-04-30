@@ -28,6 +28,7 @@
     claude-code
     slack
     google-chrome
+    apidog
 
     # Dev toolchains. nvm/fnm are intentionally excluded — they ship glibc Node
     # binaries that can't run on NixOS. Per-project version pinning is handled
