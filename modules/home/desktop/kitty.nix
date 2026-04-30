@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 
+let
+  c = config.lib.stylix.colors;
+in
 {
   home.packages = with pkgs; [ nerd-fonts._0xproto ];
 
@@ -24,6 +27,15 @@
       tab_bar_style = "powerline";
       tab_bar_min_tabs = 2;          # hide when only 1 tab (wezterm equivalent)
       tab_powerline_style = "slanted";
+
+      # Highlight the active tab (stylix doesn't set these by default).
+      # base0D = accent blue, base00 = bg → bright contrast on the active tab.
+      active_tab_foreground   = lib.mkForce "#${c.base00}";
+      active_tab_background   = lib.mkForce "#${c.base0D}";
+      active_tab_font_style   = "bold";
+      inactive_tab_foreground = lib.mkForce "#${c.base04}";
+      inactive_tab_background = lib.mkForce "#${c.base01}";
+      inactive_tab_font_style = "normal";
 
       # ── Cursor ──
       cursor_shape = "block";
