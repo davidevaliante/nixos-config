@@ -30,7 +30,7 @@ in
       general = {
         gaps_in = 6;
         gaps_out = 12;
-        border_size = 4;
+        border_size = 3;
         layout = "dwindle";
 
         "col.active_border" = lib.mkForce "rgba(${c.base0D}ee) rgba(${c.base0E}ee) rgba(${c.base0C}ee) 45deg";
@@ -38,10 +38,7 @@ in
       };
 
       decoration = {
-        # Bumped from 8 → 12 to match the corner radius GNOME-style CSD
-        # apps draw under Niri (Niri itself doesn't round at the
-        # compositor level, so this is the closest visual match).
-        rounding = 12;
+        rounding = 8;
         blur = {
           enabled = true;
           size = 6;
