@@ -22,7 +22,12 @@ in
       bar.widgets.right = lib.mkForce [
         { id = "Tray"; }
         { id = "NotificationHistory"; }
-        { id = "VPN"; }
+        {
+          id = "VPN";
+          displayMode = "alwaysShow"; # always show the pill, not just on hover
+          iconColor = "tertiary";     # purple in Oxocarbon
+          textColor = "tertiary";
+        }
         { id = "Battery"; }
         { id = "Volume"; }
         { id = "Brightness"; }
