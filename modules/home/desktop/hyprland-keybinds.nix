@@ -1,13 +1,7 @@
-{ config, ... }:
+{ desktopLib, ... }:
 
 let
-  isNoctalia = config.mySystem.desktop.shell == "noctalia";
-
-  launcherCmd   = if isNoctalia then "noctalia-shell ipc call launcher toggle"                          else "$launcher";
-  notifyCmd     = if isNoctalia then "noctalia-shell ipc call notifications toggleHistory"              else "swaync-client -t -sw";
-  lockCmd       = if isNoctalia then "noctalia-shell ipc call lockScreen lock"                          else "hyprlock";
-  sessionCmd    = if isNoctalia then "noctalia-shell ipc call sessionMenu toggle"                       else "wlogout";
-  cheatsheetCmd = if isNoctalia then "noctalia-shell ipc call plugin togglePanel keybind-cheatsheet"    else "keybind-help";
+  inherit (desktopLib) cmdsStr;
 in
 {
   # Authored as raw config (instead of `settings.bind = [ ... ]`) so we can
@@ -20,7 +14,7 @@ in
     # 1. Applications
     bind = $mod, RETURN, exec, $terminal #"Terminal"
     bind = $mod, B, exec, $browser #"Browser"
-    bind = $mod, SPACE, exec, ${launcherCmd} #"Launcher"
+    bind = $mod, SPACE, exec, ${cmdsStr.launcher} #"Launcher"
     bind = $mod, T, exec, theme-switch #"Switch theme"
 
     # 2. Window Management
@@ -68,14 +62,14 @@ in
     bind = $mod CTRL, S, exec, hyprshot -m output -o ~/Pictures/Screenshots #"Screenshot output"
 
     # 7. System
-    bind = $mod, escape, exec, ${lockCmd} #"Lock screen"
-    bind = $mod ALT, L, exec, ${lockCmd} #"Lock screen"
-    bind = $mod SHIFT, E, exec, ${sessionCmd} #"Session menu"
+    bind = $mod, escape, exec, ${cmdsStr.lock} #"Lock screen"
+    bind = $mod ALT, L, exec, ${cmdsStr.lock} #"Lock screen"
+    bind = $mod SHIFT, E, exec, ${cmdsStr.session} #"Session menu"
     bind = $mod SHIFT, Q, exit, #"Exit Hyprland"
 
     # 8. Noctalia
-    bind = $mod, N, exec, ${notifyCmd} #"Notification history"
-    bind = $mod, slash, exec, ${cheatsheetCmd} #"Keybindings cheatsheet"
+    bind = $mod, N, exec, ${cmdsStr.notify} #"Notification history"
+    bind = $mod, slash, exec, ${cmdsStr.cheatsheet} #"Keybindings cheatsheet"
 
     # 9. Mouse
     bindm = $mod, mouse:272, movewindow #"Move window"

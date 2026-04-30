@@ -3,6 +3,7 @@
 {
   imports = [
     ./options.nix
+    ./lib.nix
     ./hyprland.nix
     ./niri.nix
     ./niri-window-switcher.nix

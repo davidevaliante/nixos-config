@@ -1,14 +1,7 @@
-{ config, ... }:
+{ desktopLib, ... }:
 
 let
-  isNoctalia = config.mySystem.desktop.shell == "noctalia";
-
-  launcherSpawn   = if isNoctalia then [ "noctalia-shell" "ipc" "call" "launcher" "toggle" ]                          else [ "fuzzel" ];
-  notifySpawn     = if isNoctalia then [ "noctalia-shell" "ipc" "call" "notifications" "toggleHistory" ]              else [ "swaync-client" "-t" "-sw" ];
-  lockSpawn       = if isNoctalia then [ "noctalia-shell" "ipc" "call" "lockScreen" "lock" ]                          else [ "hyprlock" ];
-  sessionSpawn    = if isNoctalia then [ "noctalia-shell" "ipc" "call" "sessionMenu" "toggle" ]                       else [ "wlogout" ];
-  cheatsheetSpawn = if isNoctalia then [ "noctalia-shell" "ipc" "call" "plugin" "togglePanel" "keybind-cheatsheet" ]  else [ "keybind-help" ];
-  windowSwitchSpawn = if isNoctalia then [ "noctalia-shell" "ipc" "call" "launcher" "windows" ]                     else [ "niri-window-switcher" ];
+  inherit (desktopLib) cmds;
 
   screenshotRegion = "grim -g \"$(slurp)\" - | satty --filename - --output-filename ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png --copy-command wl-copy";
   screenshotFull   = "grim - | satty --filename - --output-filename ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png --copy-command wl-copy";
@@ -17,17 +10,17 @@ in
   programs.niri.settings.binds = {
     "Mod+Return"   = { action.spawn = [ "kitty" ];                 hotkey-overlay.title = "Terminal"; };
     "Mod+B"        = { action.spawn = [ "google-chrome-stable" ];  hotkey-overlay.title = "Browser"; };
-    "Mod+Space"    = { action.spawn = launcherSpawn;               hotkey-overlay.title = "Launcher"; };
+    "Mod+Space"    = { action.spawn = cmds.launcher;               hotkey-overlay.title = "Launcher"; };
     "Mod+Q"        = { action.close-window = [ ];                  hotkey-overlay.title = "Close window"; };
     "Mod+Shift+Q"  = { action.quit = [ ];                          hotkey-overlay.title = "Quit niri"; };
-    "Mod+Escape"   = { action.spawn = lockSpawn;                   hotkey-overlay.title = "Lock screen"; };
-    "Mod+Alt+L"    = { action.spawn = lockSpawn;                   hotkey-overlay.title = "Lock screen"; };
-    "Mod+N"        = { action.spawn = notifySpawn;                 hotkey-overlay.title = "Notification history"; };
+    "Mod+Escape"   = { action.spawn = cmds.lock;                   hotkey-overlay.title = "Lock screen"; };
+    "Mod+Alt+L"    = { action.spawn = cmds.lock;                   hotkey-overlay.title = "Lock screen"; };
+    "Mod+N"        = { action.spawn = cmds.notify;                 hotkey-overlay.title = "Notification history"; };
     "Mod+T"        = { action.spawn = [ "theme-switch" ];          hotkey-overlay.title = "Switch theme"; };
-    "Mod+Shift+E"  = { action.spawn = sessionSpawn;                hotkey-overlay.title = "Session menu"; };
-    "Mod+Slash"    = { action.spawn = cheatsheetSpawn;             hotkey-overlay.title = "Keybind cheatsheet"; };
+    "Mod+Shift+E"  = { action.spawn = cmds.session;                hotkey-overlay.title = "Session menu"; };
+    "Mod+Slash"    = { action.spawn = cmds.cheatsheet;             hotkey-overlay.title = "Keybind cheatsheet"; };
     "Mod+O"        = { action.toggle-overview = [ ];               hotkey-overlay.title = "Toggle overview"; };
-    "Mod+G"        = { action.spawn = windowSwitchSpawn;           hotkey-overlay.title = "Find window"; };
+    "Mod+G"        = { action.spawn = cmds.windowSwitch;           hotkey-overlay.title = "Find window"; };
     "Mod+Shift+R"  = { action.spawn = [ "niri-workspace-rename" ]; hotkey-overlay.title = "Rename workspace"; };
 
     "Mod+H"          = { action.focus-column-left = [ ];           hotkey-overlay.title = "Focus column left"; };
