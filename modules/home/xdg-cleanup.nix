@@ -16,6 +16,10 @@ in
   programs.zsh.dotDir = ".config/zsh";
   programs.zsh.history.path = "${xdgState}/zsh/history";
 
+  # GTK2 — home-manager's gtk2 module owns GTK2_RC_FILES; setting this option
+  # makes it write the rc file there *and* update the env var consistently.
+  gtk.gtk2.configLocation = "${xdgConfig}/gtk-2.0/gtkrc";
+
   home.sessionVariables = {
     # Rust toolchain (rustup populates this; cargo also looks at CARGO_HOME).
     RUSTUP_HOME = "${xdgData}/rustup";
@@ -24,9 +28,6 @@ in
     # npm — global install prefix lives under data, cache under cache.
     NPM_CONFIG_CACHE  = "${xdgCache}/npm";
     NPM_CONFIG_PREFIX = "${xdgData}/npm";
-
-    # GTK2 (GTK3+ already reads from XDG_CONFIG_HOME).
-    GTK2_RC_FILES = "${xdgConfig}/gtk-2.0/gtkrc";
 
     # less / readline / wget history (small but pollute $HOME).
     LESSHISTFILE = "${xdgState}/less/history";
