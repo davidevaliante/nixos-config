@@ -36,26 +36,29 @@ let
 
       # 4. Activate corepack shims (pnpm/yarn). Idempotent.
       echo ">>> corepack enable"
-      corepack enable --install-directory "$HOME/.local/bin" 2>/dev/null \
-        || corepack enable 2>/dev/null \
+      mkdir -p "$HOME/.local/bin"
+      corepack enable --install-directory "$HOME/.local/bin" \
         || echo "!! corepack enable failed (continuing — pnpm via 'corepack pnpm' still works)"
 
       # 5. Import OpenVPN profiles into NetworkManager. sops decrypts the
       #    .ovpn files into /run/secrets/ at boot; we just need to register
       #    them with NM the first time. Skip if already imported.
+      #    Iterating an explicit name list (not a glob) — /run/secrets is
+      #    not user-listable even though individual files inside are
+      #    readable, so a glob silently expands to nothing.
       echo ">>> import OpenVPN profiles"
-      for ovpn in /run/secrets/openvpn-*.ovpn; do
-        [ -r "$ovpn" ] || continue
-        name=$(basename "$ovpn" .ovpn)   # e.g. openvpn-tg-prod
+      for name in openvpn-tg-prod openvpn-tg-dev; do
+        ovpn="/run/secrets/$name.ovpn"
+        if [ ! -r "$ovpn" ]; then
+          echo "    $name: source missing at $ovpn, skipping"
+          continue
+        fi
         if nmcli -t -f NAME connection show 2>/dev/null | grep -qx "$name"; then
           echo "    $name already imported"
         else
           echo "    importing $name"
           nmcli connection import type openvpn file "$ovpn" \
             || echo "    !! import of $name failed (continuing)"
-          # `import` derives the connection name from the filename
-          # (e.g. `openvpn-tg-prod`); that lines up with our existence
-          # check above.
         fi
       done
 
