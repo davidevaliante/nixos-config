@@ -65,6 +65,10 @@ in
     "Mod+Shift+9" = { action.move-column-to-workspace = [ 9 ]; hotkey-overlay.title = "Move column to workspace 9"; };
 
     "Mod+R"        = { action.switch-preset-column-width = [ ];    hotkey-overlay.title = "Cycle column width"; };
+    "Mod+Minus"        = { action.set-column-width = [ "-10%" ]; hotkey-overlay.title = "Shrink column"; };
+    "Mod+Equal"        = { action.set-column-width = [ "+10%" ]; hotkey-overlay.title = "Grow column"; };
+    "Mod+Shift+Minus"  = { action.set-window-height = [ "-10%" ]; hotkey-overlay.title = "Shrink window height"; };
+    "Mod+Shift+Equal"  = { action.set-window-height = [ "+10%" ]; hotkey-overlay.title = "Grow window height"; };
     "Mod+F"        = { action.maximize-column = [ ];               hotkey-overlay.title = "Maximize column"; };
     "Mod+Shift+F"  = { action.fullscreen-window = [ ];             hotkey-overlay.title = "Fullscreen window"; };
     "Mod+V"        = { action.toggle-window-floating = [ ];        hotkey-overlay.title = "Toggle floating"; };
