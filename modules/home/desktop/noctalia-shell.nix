@@ -1,8 +1,33 @@
-{ config, lib, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   cfg = config.mySystem.desktop;
   active = cfg.shell == "noctalia";
+
+  # The keybind-cheatsheet plugin parses the niri/hyprland config once and
+  # caches the result in its plugin settings.json forever — new binds added
+  # later don't appear until that cache is cleared and the shell restarts.
+  # `noctalia-reload` does both, and `home.activation` wipes the cache on
+  # every HM rebuild so the next shell start always re-parses.
+  cheatsheetCache = "$HOME/.config/noctalia/plugins/keybind-cheatsheet/settings.json";
+
+  noctaliaReload = pkgs.writeShellScriptBin "noctalia-reload" ''
+    set -eu
+    pid=$(${pkgs.procps}/bin/pgrep -x quickshell || true)
+    if [ -n "$pid" ]; then
+      kill "$pid" || true
+      for _ in 1 2 3 4 5; do
+        kill -0 "$pid" 2>/dev/null || break
+        sleep 0.2
+      done
+    fi
+    if [ -f "${cheatsheetCache}" ]; then
+      ${pkgs.jq}/bin/jq '.cheatsheetData = [] | .detectedCompositor = ""' \
+        "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
+        && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
+    fi
+    setsid noctalia-shell </dev/null >/dev/null 2>&1 &
+  '';
 in
 {
   imports = [ inputs.noctalia.homeModules.default ];
@@ -84,6 +109,23 @@ in
   xdg.configFile."noctalia/colorschemes/Oxocarbon/Oxocarbon.json" = lib.mkIf active {
     source = ./noctalia/colorschemes/Oxocarbon.json;
   };
+
+  home.packages = lib.mkIf active [ noctaliaReload ];
+
+  # Wipe the keybind-cheatsheet cache on every rebuild. The plugin only
+  # re-parses when this is empty, so this guarantees the next noctalia
+  # start (whether via `noctalia-reload`, logout, or reboot) picks up new
+  # binds. While noctalia is running it keeps stale data in memory — run
+  # `noctalia-reload` to refresh immediately.
+  home.activation.noctaliaCheatsheetCacheReset = lib.mkIf active (
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [ -f "${cheatsheetCache}" ]; then
+        ${pkgs.jq}/bin/jq '.cheatsheetData = [] | .detectedCompositor = ""' \
+          "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
+          && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
+      fi
+    ''
+  );
 
   # Noctalia's home module no longer manages a systemd unit (deprecated upstream),
   # so the shell must be launched from each compositor's autostart.

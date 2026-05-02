@@ -33,7 +33,7 @@ in
       enable_audio_bell = false;
       confirm_os_window_close = 0;
       hide_window_decorations = "yes";
-      window_padding_width = "0 8";
+      window_padding_width = "8 8";
       placement_strategy = "center";
 
       # ── Tab bar ──
