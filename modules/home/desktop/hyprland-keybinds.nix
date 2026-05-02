@@ -19,7 +19,7 @@ in
 
     # 2. Window Management
     bind = $mod, Q, killactive, #"Close window"
-    bind = $mod, V, togglefloating, #"Toggle floating"
+    bind = $mod SHIFT, V, togglefloating, #"Toggle floating"
     bind = $mod, F, fullscreen, 0 #"Toggle fullscreen"
     bind = $mod, P, pseudo, #"Toggle pseudo"
     bind = $mod, J, togglesplit, #"Toggle split direction"
@@ -70,6 +70,7 @@ in
     # 8. Noctalia
     bind = $mod, N, exec, ${cmdsStr.notify} #"Notification history"
     bind = $mod, slash, exec, ${cmdsStr.cheatsheet} #"Keybindings cheatsheet"
+    bind = $mod, V, exec, ${cmdsStr.clipboard} #"Clipboard history"
 
     # 9. Mouse
     bindm = $mod, mouse:272, movewindow #"Move window"

@@ -8,6 +8,7 @@
     ./niri.nix
     ./niri-window-switcher.nix
     ./niri-workspace-rename.nix
+    ./clipboard-picker.nix
     ./waybar.nix
     ./swaync.nix
     ./fuzzel.nix

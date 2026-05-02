@@ -65,7 +65,8 @@ in
     "Mod+Shift+Equal"  = { action.set-window-height = [ "+10%" ]; hotkey-overlay.title = "Grow window height"; };
     "Mod+F"        = { action.maximize-column = [ ];               hotkey-overlay.title = "Maximize column"; };
     "Mod+Shift+F"  = { action.fullscreen-window = [ ];             hotkey-overlay.title = "Fullscreen window"; };
-    "Mod+V"        = { action.toggle-window-floating = [ ];        hotkey-overlay.title = "Toggle floating"; };
+    "Mod+V"        = { action.spawn = cmds.clipboard;              hotkey-overlay.title = "Clipboard history"; };
+    "Mod+Shift+V"  = { action.toggle-window-floating = [ ];        hotkey-overlay.title = "Toggle floating"; };
     "Mod+W"        = { action.toggle-column-tabbed-display = [ ];  hotkey-overlay.title = "Toggle tabbed column"; };
 
     "Mod+S"        = { action.spawn-sh = [ screenshotRegion ]; hotkey-overlay.title = "Screenshot region"; };

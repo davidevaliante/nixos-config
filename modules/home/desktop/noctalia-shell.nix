@@ -13,7 +13,9 @@ let
 
   noctaliaReload = pkgs.writeShellScriptBin "noctalia-reload" ''
     set -eu
-    pid=$(${pkgs.procps}/bin/pgrep -x quickshell || true)
+    # The nix wrapper renames the process to `.quickshell-wra`, so we match
+    # by full command line against the bin path instead of process name.
+    pid=$(${pkgs.procps}/bin/pgrep -f '/bin/quickshell$' || true)
     if [ -n "$pid" ]; then
       kill "$pid" || true
       for _ in 1 2 3 4 5; do
@@ -84,6 +86,10 @@ in
           enabled = true;
           sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
         };
+        clipper = {
+          enabled = true;
+          sourceUrl = "https://github.com/blackbartblues/noctalia-clipper";
+        };
       };
     };
   };
@@ -103,6 +109,11 @@ in
 
   xdg.configFile."noctalia/plugins/screen-toolkit" = lib.mkIf active {
     source = "${inputs.noctalia-plugins}/screen-toolkit";
+    recursive = true;
+  };
+
+  xdg.configFile."noctalia/plugins/clipper" = lib.mkIf active {
+    source = inputs.noctalia-clipper.outPath;
     recursive = true;
   };
 

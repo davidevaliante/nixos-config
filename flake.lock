@@ -317,6 +317,22 @@
         "type": "github"
       }
     },
+    "noctalia-clipper": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770581711,
+        "narHash": "sha256-8fiyBFgS2diCr8UzmJLLRRXNCCgnzMsH0r05r89Gdzc=",
+        "owner": "blackbartblues",
+        "repo": "noctalia-clipper",
+        "rev": "0c38dc729d41e8f25424a179a24c996d83bb1ae2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "blackbartblues",
+        "repo": "noctalia-clipper",
+        "type": "github"
+      }
+    },
     "noctalia-plugins": {
       "flake": false,
       "locked": {
@@ -390,6 +406,7 @@
         "nixpkgs-opentofu": "nixpkgs-opentofu",
         "nixpkgs-stable": "nixpkgs-stable_2",
         "noctalia": "noctalia",
+        "noctalia-clipper": "noctalia-clipper",
         "noctalia-plugins": "noctalia-plugins",
         "sops-nix": "sops-nix",
         "stylix": "stylix"

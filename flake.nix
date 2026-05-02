@@ -46,6 +46,13 @@
       url = "github:noctalia-dev/noctalia-plugins";
       flake = false;
     };
+
+    # Third-party noctalia plugin. Pinned to master via the flake lock so a
+    # `nix flake update` is a deliberate bump.
+    noctalia-clipper = {
+      url = "github:blackbartblues/noctalia-clipper";
+      flake = false;
+    };
   };
 
   outputs = inputs @ { self, nixpkgs, home-manager, ... }:

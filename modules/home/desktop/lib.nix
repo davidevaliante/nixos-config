@@ -15,6 +15,7 @@ let
     session      = if isNoctalia then [ "noctalia-shell" "ipc" "call" "sessionMenu" "toggle" ]                      else [ "wlogout" ];
     cheatsheet   = if isNoctalia then [ "noctalia-shell" "ipc" "call" "plugin" "togglePanel" "keybind-cheatsheet" ] else [ "keybind-help" ];
     windowSwitch = if isNoctalia then [ "noctalia-shell" "ipc" "call" "launcher" "windows" ]                        else [ "niri-window-switcher" ];
+    clipboard    = if isNoctalia then [ "noctalia-shell" "ipc" "call" "plugin:clipper" "toggle" ]                   else [ "clipboard-picker" ];
   };
 
   cmdsStr = builtins.mapAttrs (_: builtins.concatStringsSep " ") cmds;
