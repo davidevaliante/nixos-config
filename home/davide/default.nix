@@ -46,6 +46,7 @@
     awscli2
 
     authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
+    rquickshare     # receive Android Quick Share to this laptop
   ];
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
