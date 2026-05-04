@@ -72,6 +72,17 @@ in
     "Mod+S"        = { action.spawn-sh = [ screenshotRegion ]; hotkey-overlay.title = "Screenshot region"; };
     "Mod+Shift+S"  = { action.spawn-sh = [ screenshotFull ];   hotkey-overlay.title = "Screenshot full screen"; };
 
+    # VT switching — niri (like every Wayland compositor) captures keystrokes
+    # by default, so Ctrl+Alt+Fn does nothing without an explicit binding.
+    # Needed as a rescue path when a display manager / compositor swap goes
+    # bad: get to a TTY, log in, run `nixos-rebuild switch --rollback`.
+    "Ctrl+Alt+F1"  = { action.change-vt = [ 1 ]; allow-when-locked = true; };
+    "Ctrl+Alt+F2"  = { action.change-vt = [ 2 ]; allow-when-locked = true; };
+    "Ctrl+Alt+F3"  = { action.change-vt = [ 3 ]; allow-when-locked = true; };
+    "Ctrl+Alt+F4"  = { action.change-vt = [ 4 ]; allow-when-locked = true; };
+    "Ctrl+Alt+F5"  = { action.change-vt = [ 5 ]; allow-when-locked = true; };
+    "Ctrl+Alt+F6"  = { action.change-vt = [ 6 ]; allow-when-locked = true; };
+
     "XF86AudioRaiseVolume"  = { action.spawn = [ "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" ];   hotkey-overlay.title = "Volume up"; };
     "XF86AudioLowerVolume"  = { action.spawn = [ "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-" ];   hotkey-overlay.title = "Volume down"; };
     "XF86AudioMute"         = { action.spawn = [ "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle" ]; hotkey-overlay.title = "Mute toggle"; };

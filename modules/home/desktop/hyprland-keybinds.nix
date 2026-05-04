@@ -87,5 +87,15 @@ in
     # 11. Brightness
     bindel = , XF86MonBrightnessUp, exec, brightnessctl set 5%+ #"Brightness up"
     bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%- #"Brightness down"
+
+    # 12. Virtual Terminals
+    # Hyprland captures Ctrl+Alt+Fn by default; bind explicitly so a TTY
+    # rescue is reachable when a DM/compositor swap goes bad.
+    bind = CTRL ALT, F1, exec, chvt 1 #"Switch to TTY 1"
+    bind = CTRL ALT, F2, exec, chvt 2 #"Switch to TTY 2"
+    bind = CTRL ALT, F3, exec, chvt 3 #"Switch to TTY 3"
+    bind = CTRL ALT, F4, exec, chvt 4 #"Switch to TTY 4"
+    bind = CTRL ALT, F5, exec, chvt 5 #"Switch to TTY 5"
+    bind = CTRL ALT, F6, exec, chvt 6 #"Switch to TTY 6"
   '';
 }
