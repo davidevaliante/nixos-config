@@ -5,7 +5,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos/common.nix
     ../../modules/nixos/users.nix
-    ../../modules/nixos/desktops/sddm.nix
+    ../../modules/nixos/desktops/gnome.nix
     ../../modules/nixos/desktops/hyprland.nix
     ../../modules/nixos/desktops/niri.nix
     ../../modules/nixos/stylix.nix
