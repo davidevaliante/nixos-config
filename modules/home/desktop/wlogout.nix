@@ -12,7 +12,7 @@ lib.mkIf (config.mySystem.desktop.shell == "traditional") {
     }
     {
         "label" : "logout",
-        "action" : "loginctl terminate-user $USER",
+        "action" : "case $XDG_CURRENT_DESKTOP in niri) niri msg action quit -s ;; Hyprland) hyprctl dispatch exit ;; *) loginctl terminate-user $USER ;; esac",
         "text" : "Logout",
         "keybind" : "e"
     }

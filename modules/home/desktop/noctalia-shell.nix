@@ -66,6 +66,33 @@ in
         useWallpaperColors = false;
         predefinedScheme = "Oxocarbon";
       };
+
+      # Override the session menu's logout action.
+      #
+      # Noctalia's default logout calls `loginctl terminate-session`, which kills
+      # the systemd user scope but leaves niri/Hyprland running detached — the
+      # compositor never tells the DM to reclaim the display, so GDM hangs and
+      # only a hard reboot recovers. The fix per niri/discussions/{2729,3038} is
+      # to ask the compositor to quit itself first; logind cleanup follows
+      # cleanly. We pin the full powerOptions array (entries with empty
+      # `command` fall through to noctalia's defaults) so the menu still shows
+      # every option — overriding only `logout`.
+      sessionMenu.powerOptions = lib.mkForce [
+        { action = "lock";            enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        { action = "suspend";         enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        { action = "hibernate";       enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        { action = "reboot";          enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        { action = "userspaceReboot"; enabled = false; countdownEnabled = true; command = ""; keybind = ""; }
+        { action = "rebootToUefi";    enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        {
+          action = "logout";
+          enabled = true;
+          countdownEnabled = true;
+          command = "case $XDG_CURRENT_DESKTOP in niri) niri msg action quit -s ;; Hyprland) hyprctl dispatch exit ;; esac";
+          keybind = "";
+        }
+        { action = "shutdown";        enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+      ];
     };
 
     plugins = {
