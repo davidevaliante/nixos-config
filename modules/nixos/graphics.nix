@@ -15,9 +15,11 @@
   # `va_openDriver() returns -1`, killing hardware video decode in Chrome/Slack/etc.
   environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
 
-  # The discrete NVIDIA RTX 4060 (Max-Q) is left on `nouveau` and unused — Intel
-  # iGPU handles everything. Enabling the proprietary `nvidia` driver + PRIME
-  # offload is doable but adds significant complexity (signed kernel modules,
-  # power-management quirks, suspend/resume issues). Revisit if/when CUDA or
-  # serious 3D workloads become necessary.
+  # The discrete NVIDIA RTX 4060 (Max-Q) is fully disabled. `nouveau` is the
+  # in-kernel open-source driver — it's slow, has no CUDA/working VDPAU, and
+  # was implicated in DRM/KMS handoff issues during display-manager restarts.
+  # Blacklisting it leaves the dGPU powered down (Intel iGPU handles
+  # everything). Switch to the proprietary `nvidia` driver in PRIME offload
+  # mode if/when CUDA, gaming, or ML workloads become real needs.
+  boot.blacklistedKernelModules = [ "nouveau" ];
 }
