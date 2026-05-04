@@ -17,6 +17,14 @@
     # specific tofu minor.
     nixpkgs-opentofu.url = "github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d";
 
+    # flake-parts gives us a typed, modular flake-output story. Adopted to
+    # make adding hosts/devShells/packages later a structural concern, not
+    # a copy-paste-into-`outputs` concern.
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,37 +63,40 @@
     };
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, ... }:
-    let
-      lib = nixpkgs.lib;
+  outputs = inputs @ { self, flake-parts, nixpkgs, home-manager, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
 
-      mkHost =
-        { hostname
-        , system ? "x86_64-linux"
-        , username ? "davide"
-        , extraModules ? [ ]
-        }:
-        lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs self username hostname; };
-          modules = [
-            ./hosts/${hostname}
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "hm-bak";
-              home-manager.extraSpecialArgs = {
-                inherit inputs self username hostname;
+      flake = {
+        nixosConfigurations =
+          let
+            mkHost =
+              { hostname
+              , system ? "x86_64-linux"
+              , username ? "davide"
+              , extraModules ? [ ]
+              }:
+              nixpkgs.lib.nixosSystem {
+                inherit system;
+                specialArgs = { inherit inputs self username hostname; };
+                modules = [
+                  ./hosts/${hostname}
+                  home-manager.nixosModules.home-manager
+                  {
+                    home-manager.useGlobalPkgs = true;
+                    home-manager.useUserPackages = true;
+                    home-manager.backupFileExtension = "hm-bak";
+                    home-manager.extraSpecialArgs = {
+                      inherit inputs self username hostname;
+                    };
+                    home-manager.users.${username} = import ./home/${username};
+                  }
+                ] ++ extraModules;
               };
-              home-manager.users.${username} = import ./home/${username};
-            }
-          ] ++ extraModules;
-        };
-    in
-    {
-      nixosConfigurations = {
-        hydrogen = mkHost { hostname = "hydrogen"; };
+          in
+          {
+            hydrogen = mkHost { hostname = "hydrogen"; };
+          };
       };
     };
 }
