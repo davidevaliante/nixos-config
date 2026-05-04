@@ -39,6 +39,8 @@ in
     vscode-langservers-extracted          # html, cssls, jsonls, eslint
     gopls                                 # gopls
     nginx-language-server                 # nginx_language_server
+    nixd                                  # nixd — option/package completion against this flake
+    nixfmt                                # nixd's default formatter (opt-in via lspservers/nixd.lua)
 
     # ── Formatters (conform.nvim) ──
     stylua
