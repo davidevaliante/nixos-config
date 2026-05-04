@@ -46,6 +46,13 @@
   # GTK/Qt apps notice on cold launch (they make many dbus calls during init).
   services.dbus.implementation = "broker";
 
+  # NixOS-specific hint that the Electron/Chromium wrappers in nixpkgs check.
+  # When set, they pass `--ozone-platform-hint=auto` so the app runs natively on
+  # Wayland instead of falling back to XWayland. Affects Slack, Chrome, VS Code,
+  # Discord, and other Electron apps — measurably faster cold starts plus proper
+  # GPU acceleration.
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
   # Bluetooth — pipewire handles audio routing for BT headphones automatically
   # (LDAC/AAC/aptX work on modern wireplumber). Pairing happens via noctalia's
   # bluetooth panel; no `blueman` GUI needed.
