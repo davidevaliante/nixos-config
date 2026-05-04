@@ -6,11 +6,9 @@
     xwayland.enable = true;
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-    config.common.default = "*";
-  };
+  # Hyprland-specific portal backend; the cross-DE portal config lives in
+  # ../portal.nix.
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
 
   security.polkit.enable = true;
 

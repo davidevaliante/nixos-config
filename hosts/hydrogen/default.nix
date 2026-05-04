@@ -14,6 +14,7 @@
     ../../modules/nixos/openvpn.nix
     ../../modules/nixos/rquickshare.nix
     ../../modules/nixos/thunar.nix
+    ../../modules/nixos/portal.nix
   ];
 
   boot.loader.systemd-boot = {
