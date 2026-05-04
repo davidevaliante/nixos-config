@@ -89,13 +89,15 @@ in
     bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%- #"Brightness down"
 
     # 12. Virtual Terminals
-    # Hyprland captures Ctrl+Alt+Fn by default; bind explicitly so a TTY
-    # rescue is reachable when a DM/compositor swap goes bad.
-    bind = CTRL ALT, F1, exec, chvt 1 #"Switch to TTY 1"
-    bind = CTRL ALT, F2, exec, chvt 2 #"Switch to TTY 2"
-    bind = CTRL ALT, F3, exec, chvt 3 #"Switch to TTY 3"
-    bind = CTRL ALT, F4, exec, chvt 4 #"Switch to TTY 4"
-    bind = CTRL ALT, F5, exec, chvt 5 #"Switch to TTY 5"
-    bind = CTRL ALT, F6, exec, chvt 6 #"Switch to TTY 6"
+    # Hyprland captures Ctrl+Alt+Fn by default. We bind through systemd-logind's
+    # Seat.SwitchTo (no setuid chvt needed — logind allows the active session
+    # owner to switch VTs), so a TTY rescue stays reachable when a DM /
+    # compositor swap goes bad.
+    bind = CTRL ALT, F1, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:1 #"Switch to TTY 1"
+    bind = CTRL ALT, F2, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:2 #"Switch to TTY 2"
+    bind = CTRL ALT, F3, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:3 #"Switch to TTY 3"
+    bind = CTRL ALT, F4, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:4 #"Switch to TTY 4"
+    bind = CTRL ALT, F5, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:5 #"Switch to TTY 5"
+    bind = CTRL ALT, F6, exec, dbus-send --system --dest=org.freedesktop.login1 /org/freedesktop/login1/seat/seat0 org.freedesktop.login1.Seat.SwitchTo uint32:6 #"Switch to TTY 6"
   '';
 }
