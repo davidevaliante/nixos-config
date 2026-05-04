@@ -13,6 +13,7 @@
     ../../modules/nixos/aws.nix
     ../../modules/nixos/openvpn.nix
     ../../modules/nixos/rquickshare.nix
+    ../../modules/nixos/thunar.nix
   ];
 
   boot.loader.systemd-boot = {

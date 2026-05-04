@@ -60,6 +60,7 @@
       "x-scheme-handler/about" = "google-chrome.desktop";
       "x-scheme-handler/unknown" = "google-chrome.desktop";
       "x-scheme-handler/apidog" = "apidog.desktop";
+      "inode/directory" = "thunar.desktop";
     };
   };
 
