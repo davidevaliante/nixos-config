@@ -15,6 +15,7 @@
     ../../modules/nixos/rquickshare.nix
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
+    ../../modules/nixos/graphics.nix
   ];
 
   boot.loader.systemd-boot = {

@@ -41,6 +41,11 @@
 
   networking.networkmanager.enable = true;
 
+  # dbus-broker is a drop-in replacement for the reference dbus daemon written
+  # in C with a single-process model. ~3-5x lower IPC latency in practice, which
+  # GTK/Qt apps notice on cold launch (they make many dbus calls during init).
+  services.dbus.implementation = "broker";
+
   # Bluetooth — pipewire handles audio routing for BT headphones automatically
   # (LDAC/AAC/aptX work on modern wireplumber). Pairing happens via noctalia's
   # bluetooth panel; no `blueman` GUI needed.
