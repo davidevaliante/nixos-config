@@ -33,6 +33,12 @@
         user = "APKA2MJV4RLTQ464ZMYR";
         identityFile = "~/.ssh/id_rsa";
         port = 22;
+        # OpenSSH 10 warns on every connection that the session isn't using a
+        # post-quantum KEX ("store now, decrypt later"). AWS CodeCommit doesn't
+        # support hybrid PQ KEX yet, so the fallback is unavoidable until they
+        # upgrade. Suppress the noise for this host only — auth via SSH keys is
+        # unaffected; the warning is purely about session confidentiality.
+        extraOptions.LogLevel = "ERROR";
       };
 
       "btcnode" = {

@@ -44,6 +44,8 @@
     rustup
 
     awscli2
+
+    authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
   ];
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
