@@ -35,6 +35,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Declarative disk partitioning + LUKS layout. Hosts that opt in import
+    # `inputs.disko.nixosModules.disko` and a per-host `disko.nix`. Keeps the
+    # disk layout in git so reinstalls don't rely on remembered cfdisk steps.
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -96,6 +104,7 @@
           in
           {
             hydrogen = mkHost { hostname = "hydrogen"; };
+            helium = mkHost { hostname = "helium"; };
           };
       };
     };

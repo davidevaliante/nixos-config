@@ -5,6 +5,9 @@
 keys:
   - &user_davide age156k286rx49qdkj7fddj8f7gwd92n6r0wunu7260lxcweszfy3evsc7cdap
   - &host_hydrogen  age19w4ecgrxgnelsdcnn26xfu8mkgrypmuxmgftccu5gt6ug64w3qfqvqdmpz
+  # Placeholder — substituted on helium's first boot by scripts/sops-bootstrap.sh
+  # using the host's age pubkey derived from /etc/ssh/ssh_host_ed25519_key.pub.
+  - &host_helium    age1REPLACE_WITH_HOST_helium_PUBKEY
 
 creation_rules:
   - path_regex: secrets/common/[^/]+\.yaml$
@@ -12,9 +15,16 @@ creation_rules:
       - age:
           - *user_davide
           - *host_hydrogen
+          - *host_helium
 
   - path_regex: secrets/hosts/hydrogen/[^/]+\.yaml$
     key_groups:
       - age:
           - *user_davide
           - *host_hydrogen
+
+  - path_regex: secrets/hosts/helium/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *user_davide
+          - *host_helium
