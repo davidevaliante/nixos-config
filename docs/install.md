@@ -7,11 +7,16 @@ for every new machine. For sops-specific background, see `docs/sops.md`.
 This flow uses [disko](https://github.com/nix-community/disko) to declare disk
 layout in the flake, so partitioning is reproducible and a host can be reinstalled
 by re-running the same commands. It does **not** use Calamares — see the warning
-in step 9.
+in step 11.
+
+The install is **single-phase**: we pre-derive the new host's SSH/age keys on
+an existing machine *before* walking to the new one, so secrets are already
+re-encrypted to include the new host by the time the install runs. No
+commented-out modules, no second rebuild after first boot.
 
 ---
 
-## Prerequisites — scaffold the host first (on hydrogen)
+## Stage 1 — Scaffold the host (on an existing machine, e.g. hydrogen)
 
 Before walking to the new machine, add scaffolding to the repo and push.
 
@@ -23,7 +28,7 @@ Before walking to the new machine, add scaffolding to the repo and push.
 
 2. **`hosts/<HOSTNAME>/default.nix`** — host module. Copy a similar host's file and adjust:
    - `networking.hostName = "<HOSTNAME>"`.
-   - Imports: pick the right `modules/nixos/graphics/<intel|nvidia|amd>.nix`. Drop desktops you don't want.
+   - Imports: pick the right `modules/nixos/graphics/<intel|nvidia|amd>.nix`. Drop desktops you don't want. Include the full set of sops-dependent modules (`sops.nix`, `aws.nix`, `openvpn.nix`) — they'll work on first boot because Stage 2 below pre-derives the host key.
    - **Bootloader.** Pick one based on the dual-boot situation:
      - **systemd-boot** (default) — for single-OS hosts, or for dual-boot hosts that share an ESP with Windows (systemd-boot 252+ auto-discovers Windows Boot Manager on its own ESP).
        ```nix
@@ -44,7 +49,6 @@ Before walking to the new machine, add scaffolding to the repo and push.
          configurationLimit = 10;
        };
        ```
-   - **Do not** import `modules/nixos/sops.nix` yet — added in Phase B (a fresh host can't decrypt secrets it isn't yet a key holder for, and the activation will fail).
 
 3. **`flake.nix`** — one new line under `nixosConfigurations`:
    ```nix
@@ -56,141 +60,182 @@ Before walking to the new machine, add scaffolding to the repo and push.
    keys:
      - &user_davide age1...
      - &host_hydrogen age1...
-     - &host_<HOSTNAME> age1REPLACE_<HOSTNAME>      # NEW
+     - &host_<HOSTNAME> age1REPLACE_WITH_HOST_<HOSTNAME>_PUBKEY      # NEW
    ```
-   The `age1REPLACE_<HOSTNAME>` token is what `scripts/sops-bootstrap.sh` will substitute on first boot.
-
-5. Commit and push.
-
-6. **Copy your user age key to a USB stick** (or syncthing-private folder, etc.):
-   ```sh
-   cp ~/.config/sops/age/keys.txt /run/media/davide/<USB>/keys.txt
-   ```
+   Stage 2 substitutes this token with the real pubkey.
 
 ---
 
-## Phase A — install (on the target machine)
+## Stage 2 — Pre-derive the new host's SSH/age key (on the existing machine)
+
+This is what makes the install single-phase. We generate the SSH host key now,
+derive its age pubkey, re-encrypt every secret to include it, and carry the
+key bundle on USB. The new host boots with that key already in `/etc/ssh/`,
+so sops-nix activates cleanly on first boot.
+
+5. Generate the new host's ed25519 key into a temp dir:
+   ```sh
+   nix-shell -p openssh ssh-to-age sops --run '
+     mkdir -p /tmp/<HOSTNAME>-keys/etc/ssh
+     ssh-keygen -t ed25519 -f /tmp/<HOSTNAME>-keys/etc/ssh/ssh_host_ed25519_key -N ""
+     HOST_AGE=$(ssh-to-age < /tmp/<HOSTNAME>-keys/etc/ssh/ssh_host_ed25519_key.pub)
+     echo "host age pubkey: $HOST_AGE"
+   '
+   ```
+   Note the `host age pubkey` line — that's what goes into `.sops.yaml`.
+
+6. Replace the placeholder in `.sops.yaml`:
+   ```sh
+   sed -i "s|age1REPLACE_WITH_HOST_<HOSTNAME>_PUBKEY|$HOST_AGE|" .sops.yaml
+   git diff .sops.yaml    # sanity check
+   ```
+
+7. Re-key existing secrets so the new host is in every encryption header:
+   ```sh
+   nix-shell -p sops --run 'sops updatekeys -y .sops.yaml'
+   ```
+
+8. Commit + push:
+   ```sh
+   git add .sops.yaml secrets/
+   git commit -m "feat(sops): add <HOSTNAME> host key"
+   git push
+   ```
+
+9. **Stage the USB stick.** You'll need three things on the live ISO:
+   - The new host's pre-generated `/etc/ssh/` directory (so sops works on first boot).
+   - Your user age key (so you can author or edit secrets from the new host).
+   ```sh
+   cp -r /tmp/<HOSTNAME>-keys/etc /run/media/davide/<USB>/<HOSTNAME>-etc
+   cp ~/.config/sops/age/keys.txt /run/media/davide/<USB>/user-keys.txt
+   ```
+
+10. Wipe the in-memory copies once they're on the USB:
+    ```sh
+    rm -rf /tmp/<HOSTNAME>-keys
+    ```
+
+---
+
+## Stage 3 — Install (on the new machine)
 
 Boot the GNOME live ISO from USB.
 
-7. Connect to wifi (top-right network applet). Open a terminal.
+11. Connect to wifi (top-right network applet). Open a terminal.
 
-8. **Identify the target disk.** If the machine has multiple drives (e.g. dual-boot with Windows on another SSD), this is the most dangerous step in the whole flow.
-   ```sh
-   lsblk -o NAME,SIZE,MODEL,SERIAL,TRAN
-   ls -l /dev/disk/by-id/ | grep -v part
-   ```
-   Note the `/dev/disk/by-id/nvme-…` (or `ata-…`) of the SSD you want to install onto. **Confirm it's the empty one.**
+12. **Identify the target disk.** If the machine has multiple drives (e.g. dual-boot with Windows on another SSD), this is the most dangerous step in the whole flow.
+    ```sh
+    lsblk -o NAME,SIZE,MODEL,SERIAL,TRAN
+    ls -l /dev/disk/by-id/ | grep -v part
+    ```
+    Note the `/dev/disk/by-id/nvme-…` (or `ata-…`) of the SSD you want to install onto. **Confirm it's the empty one.**
 
-9. **Do not open Calamares** (`Install NixOS` desktop icon). Calamares will re-partition over what disko set up and write a generic `configuration.nix`. The whole install runs from the terminal.
+13. **Do not open Calamares** (`Install NixOS` desktop icon). Calamares would re-partition over what disko sets up and write a generic `configuration.nix`. The whole install runs from the terminal.
 
-10. Pull the repo onto the live ISO:
+14. Pull the repo onto the live ISO:
     ```sh
     nix-shell -p git
     git clone https://github.com/davidevaliante/nixos-config /tmp/nixos-config
     cd /tmp/nixos-config
     ```
 
-11. Edit `hosts/<HOSTNAME>/disko.nix` and replace the `REPLACE_ME` device path with the by-id you noted in step 8. **Triple-check** — the next step destroys whatever's on that disk.
+15. Edit `hosts/<HOSTNAME>/disko.nix` and replace the `REPLACE_ME` device path with the by-id you noted in step 12. **Triple-check** — the next step destroys whatever's on that disk.
 
-12. **Partition + LUKS + format + mount** with disko:
+16. **Partition + LUKS + format + mount** with disko:
     ```sh
     sudo nix --experimental-features 'nix-command flakes' run github:nix-community/disko -- \
       --mode destroy,format,mount ./hosts/<HOSTNAME>/disko.nix
     ```
     Prompts for a LUKS passphrase (twice). Pick a strong one — you'll type it at every boot.
 
-13. **Generate hardware-configuration.nix** for this machine. The `--no-filesystems` flag skips fileSystems / luks blocks (disko owns those); only kernel modules, microcode flag, and `hostPlatform` get written.
+17. **Generate `hardware-configuration.nix`** for this machine. The `--no-filesystems` flag skips fileSystems / luks blocks (disko owns those); only kernel modules, microcode flag, and `hostPlatform` get written.
     ```sh
     sudo nixos-generate-config --no-filesystems --root /mnt
     sudo cp /mnt/etc/nixos/hardware-configuration.nix \
             /tmp/nixos-config/hosts/<HOSTNAME>/hardware-configuration.nix
     ```
-    Replaces the committed stub. (The stub is enough for `nix flake check` but does not match the real machine.)
+    Replaces the committed stub.
 
-14. **Install** (Phase A — no sops):
+18. **Drop the pre-generated SSH host key into place** so sops-nix can derive its age key on first boot:
+    ```sh
+    sudo cp -r /run/media/<your-user>/<USB>/<HOSTNAME>-etc/ssh/* /mnt/etc/ssh/
+    sudo chmod 600 /mnt/etc/ssh/ssh_host_ed25519_key
+    sudo chmod 644 /mnt/etc/ssh/ssh_host_ed25519_key.pub
+    sudo chown root:root /mnt/etc/ssh/ssh_host_ed25519_key*
+    ```
+
+19. **Install:**
     ```sh
     sudo nixos-install --flake /tmp/nixos-config#<HOSTNAME> --no-root-password
     ```
-    Set davide's password when prompted.
+    Set davide's password when prompted. Activation will succeed cleanly because the host already holds an age key for every encrypted secret.
 
-15. Unmount and reboot. Eject the USB at POST.
+20. Unmount and reboot. Eject the USB at POST.
     ```sh
     sudo umount -R /mnt
     reboot
     ```
 
-16. **First boot.** Type the LUKS passphrase. The bootloader (systemd-boot or GRUB) loads NixOS. On GRUB+os-prober hosts, Windows appears as its own menu entry; on systemd-boot hosts with separate-disk Windows, use the firmware boot menu (F11/F12 at POST) to switch.
+21. **First boot.** Type the LUKS passphrase. The bootloader (systemd-boot or GRUB) loads NixOS. On GRUB+os-prober hosts, Windows appears as its own menu entry; on systemd-boot hosts with separate-disk Windows, use the firmware boot menu (F11/F12 at POST) to switch.
 
-17. Log in as davide. Connect to network.
+22. Log in as davide. Verify secrets decrypted:
+    ```sh
+    ls -la ~/.ssh    # → id_ed25519, github, etc. already present
+    ```
 
 ---
 
-## Phase B — join sops, enable secrets
+## Stage 4 — Optional: enable secrets-authoring on the new host
 
-18. Clone the repo into your home directory (replaces the `/tmp` copy from the live ISO):
-    ```sh
-    git clone https://github.com/davidevaliante/nixos-config ~/nixos-config
-    cd ~/nixos-config
-    ```
+Skip this stage if the new host is read-only for secrets. Do it if you want
+to `sops edit` from this machine (i.e. it'll be a daily driver where you
+might add secrets in the future).
 
-19. Restore your user age key from USB:
+23. Restore your user age key from USB:
     ```sh
     mkdir -p ~/.config/sops/age
-    cp /run/media/davide/<USB>/keys.txt ~/.config/sops/age/keys.txt
+    cp /run/media/davide/<USB>/user-keys.txt ~/.config/sops/age/keys.txt
     chmod 600 ~/.config/sops/age/keys.txt
     ```
 
-20. Run the bootstrap. It detects the existing user key, derives this host's age pubkey from `/etc/ssh/ssh_host_ed25519_key.pub`, and substitutes the `age1REPLACE_WITH_HOST_<HOSTNAME>_PUBKEY` placeholder in `.sops.yaml`:
+24. Clone the repo into your home directory:
     ```sh
-    bash scripts/sops-bootstrap.sh
+    git clone git@github.com:davidevaliante/nixos-config.git ~/nixos-config
     ```
 
-21. **Re-key** existing secrets so this host can decrypt them:
+25. Commit the new `hardware-configuration.nix` (was generated in step 17 and replaced the stub):
     ```sh
-    nix-shell -p sops --run 'sops updatekeys -y .sops.yaml'
-    ```
-
-22. Commit + push:
-    ```sh
-    git add .sops.yaml secrets/
-    git commit -m "feat(sops): add <HOSTNAME> host key"
-    git push
-    ```
-
-23. **Commit the new `hardware-configuration.nix`** (it was generated on this host in step 13 and replaced the stub):
-    ```sh
+    cd ~/nixos-config
     git add hosts/<HOSTNAME>/hardware-configuration.nix
     git commit -m "feat(<HOSTNAME>): add real hardware-configuration.nix"
     git push
     ```
 
-24. Uncomment **all three** sops-dependent imports in `hosts/<HOSTNAME>/default.nix` (the scaffolded file ships them commented out as a Phase A block):
-    - `../../modules/nixos/sops.nix`
-    - `../../modules/nixos/aws.nix`
-    - `../../modules/nixos/openvpn.nix`
-
-    Then rebuild:
-    ```sh
-    sudo nixos-rebuild switch --flake ~/nixos-config#<HOSTNAME>
-    ```
-
-25. Verify:
-    ```sh
-    ls -la ~/.ssh    # → id_ed25519, github, etc. should now exist
-    ```
-
-26. Commit the sops import change and push. **On every other host** (`hydrogen`, etc.), run `git pull` so they pick up the re-keyed secrets next rebuild.
+26. On every *other* host, `git pull` so subsequent rebuilds see the re-keyed secrets.
 
 ---
 
 ## Done
 
-The new host now has full parity with the rest of the fleet: same packages, same theming, same SSH/AWS/VPN secrets, reproducible disk layout. To reinstall later, repeat from step 7 — the disko layout is in git.
+The new host has full parity with the rest of the fleet: same packages, same
+theming, same SSH/AWS/VPN secrets, reproducible disk layout. To reinstall
+later, repeat from step 11 — the disko layout is in git, the host's age key
+already exists in `.sops.yaml`, and you can re-use the same `<HOSTNAME>-etc`
+USB bundle (or regenerate it from Stage 2).
 
 ## Caveats
 
-- **Two-phase sops** is unavoidable on a fresh host. The host's age pubkey is derived from its SSH host key, which doesn't exist until first boot. There's no way to encrypt secrets to a key that hasn't been generated yet.
+- **Disko destroys the target disk.** There is no undo. Step 12's `lsblk` is the last line of defense.
+- **Pre-generated SSH key on USB** is a private key in cleartext. Wipe it from the USB after install (`shred -u /run/media/.../ssh_host_ed25519_key`), or use a USB you destroy / encrypt afterward. Same for `user-keys.txt`.
 - **Windows dual-boot bootloader choice** matters: same-ESP setups can use systemd-boot (auto-discovers Windows); separate-disk setups need GRUB+os-prober for a unified menu. See step 2.
 - **os-prober occasionally misses Windows** after major Windows updates (Windows can rewrite its BCD location). Re-running `nixos-rebuild switch` re-runs os-prober and usually picks it up. If not, mount the Windows ESP read-only somewhere and inspect `\EFI\Microsoft\Boot\`.
-- **Disko destroys the target disk.** There is no undo. Step 8's `lsblk` is the last line of defense.
+
+## Why this design
+
+The "two-phase install with commented-out modules" approach (an older revision
+of this doc) is a workaround for not knowing the host's age pubkey at install
+time. By pre-generating the SSH key on Stage 2 we know the pubkey upfront,
+re-key all secrets to include it, and the install proceeds in one phase. This
+is the standard pattern in larger sops-nix repos (see Mic92/dotfiles,
+Misterio77/nix-config) and what `nixos-anywhere --extra-files` does
+under the hood.

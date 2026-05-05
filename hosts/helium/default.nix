@@ -15,13 +15,9 @@
     ../../modules/nixos/desktops/hyprland.nix
     ../../modules/nixos/desktops/niri.nix
     ../../modules/nixos/stylix.nix
-    # Phase B (after sops-bootstrap + sops updatekeys, see docs/install.md):
-    # uncomment all three. Each references sops.secrets and won't evaluate
-    # until the sops module is imported AND the secrets are re-keyed for
-    # this host.
-    # ../../modules/nixos/sops.nix
-    # ../../modules/nixos/aws.nix
-    # ../../modules/nixos/openvpn.nix
+    ../../modules/nixos/sops.nix
+    ../../modules/nixos/aws.nix
+    ../../modules/nixos/openvpn.nix
     ../../modules/nixos/rquickshare.nix
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
