@@ -71,7 +71,14 @@
     };
   };
 
-  outputs = inputs @ { self, flake-parts, nixpkgs, home-manager, ... }:
+  outputs =
+    inputs@{
+      self,
+      flake-parts,
+      nixpkgs,
+      home-manager,
+      ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
 
@@ -83,14 +90,22 @@
         nixosConfigurations =
           let
             mkHost =
-              { hostname
-              , system ? "x86_64-linux"
-              , username ? "davide"
-              , extraModules ? [ ]
+              {
+                hostname,
+                system ? "x86_64-linux",
+                username ? "davide",
+                extraModules ? [ ],
               }:
               nixpkgs.lib.nixosSystem {
                 inherit system;
-                specialArgs = { inherit inputs self username hostname; };
+                specialArgs = {
+                  inherit
+                    inputs
+                    self
+                    username
+                    hostname
+                    ;
+                };
                 modules = [
                   ./hosts/${hostname}
                   home-manager.nixosModules.home-manager
@@ -99,11 +114,17 @@
                     home-manager.useUserPackages = true;
                     home-manager.backupFileExtension = "hm-bak";
                     home-manager.extraSpecialArgs = {
-                      inherit inputs self username hostname;
+                      inherit
+                        inputs
+                        self
+                        username
+                        hostname
+                        ;
                     };
                     home-manager.users.${username} = import ./home/${username};
                   }
-                ] ++ extraModules;
+                ]
+                ++ extraModules;
               };
           in
           {
