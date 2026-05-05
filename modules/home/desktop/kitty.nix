@@ -8,12 +8,15 @@ in
 
   # Replace the cat icon with a generic terminal glyph from the active icon
   # theme. User-level desktop entries override the kitty package's own.
+  # `org.gnome.Terminal` renders as a more detailed, less stylized terminal
+  # in Papirus at the 40px size noctalia uses for notifications, compared
+  # to `utilities-terminal` which is intentionally chunky at small sizes.
   xdg.desktopEntries.kitty = {
     name = "kitty";
     genericName = "Terminal emulator";
     comment = "Fast, feature-rich, GPU based terminal";
     exec = "kitty";
-    icon = "utilities-terminal";
+    icon = "org.gnome.Terminal";
     terminal = false;
     type = "Application";
     startupNotify = true;

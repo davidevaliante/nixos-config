@@ -19,6 +19,7 @@
     ../../modules/home/programs/kubeconfig.nix
     ../../modules/home/programs/bootstrap.nix
     ../../modules/home/programs/obs.nix
+    ../../modules/home/programs/claude-code.nix
     ../../modules/home/xdg-cleanup.nix
     ../../modules/home/desktop
   ];
@@ -27,7 +28,6 @@
   home.homeDirectory = "/home/${username}";
 
   home.packages = with pkgs; [
-    claude-code
     slack
     google-chrome
     apidog
