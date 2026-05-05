@@ -66,6 +66,18 @@ in
       size = 24;
     };
 
+    # Without an icon theme, freedesktop named-icon lookups (e.g.
+    # `utilities-terminal` in our kitty .desktop entry) fall through to
+    # hicolor and render GTK's pink/black missing-image placeholder.
+    # Papirus has near-complete coverage of named icons + stylix-friendly
+    # dark/light variants.
+    icons = {
+      enable = true;
+      package = pkgs.papirus-icon-theme;
+      dark = "Papirus-Dark";
+      light = "Papirus-Light";
+    };
+
     opacity = {
       terminal = 0.95;
       applications = 1.0;
