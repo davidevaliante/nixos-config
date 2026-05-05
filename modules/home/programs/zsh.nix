@@ -15,6 +15,11 @@
       rebuilddry  = "sudo nixos-rebuild build --flake /home/davide/nixos-config#hydrogen";
       zz = "cd ..";
       zzz = "cd ../..";
+
+      # kitten ssh copies kitty's terminfo to the remote on connect, so
+      # `clear`/ncurses programs stop erroring with `'xterm-kitty': unknown
+      # terminal type` on servers that lack the entry.
+      ssh = "kitten ssh";
     };
 
     history = {
