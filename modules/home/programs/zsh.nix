@@ -9,10 +9,12 @@
     historySubstringSearch.enable = true;
 
     shellAliases = {
-      rebuild     = "sudo nixos-rebuild switch --flake /home/davide/nixos-config#hydrogen";
-      rebuildup   = "sudo nix flake update --flake /home/davide/nixos-config && sudo nixos-rebuild switch --flake /home/davide/nixos-config#hydrogen";
-      rebuildboot = "sudo nixos-rebuild boot --flake /home/davide/nixos-config#hydrogen";
-      rebuilddry  = "sudo nixos-rebuild build --flake /home/davide/nixos-config#hydrogen";
+      # nix-switch (modules/home/programs/nix-switch.nix) reads /etc/hostname
+      # so the same aliases work on every host without hardcoding the flake target.
+      rebuild     = "nix-switch";
+      rebuildup   = "nix-switch update";
+      rebuildboot = "nix-switch boot";
+      rebuilddry  = "nix-switch dry";
       zz = "cd ..";
       zzz = "cd ../..";
 
