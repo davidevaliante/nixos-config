@@ -40,27 +40,9 @@ let
       corepack enable --install-directory "$HOME/.local/bin" \
         || echo "!! corepack enable failed (continuing — pnpm via 'corepack pnpm' still works)"
 
-      # 5. Import OpenVPN profiles into NetworkManager. sops decrypts the
-      #    .ovpn files into /run/secrets/ at boot; we just need to register
-      #    them with NM the first time. Skip if already imported.
-      #    Iterating an explicit name list (not a glob) — /run/secrets is
-      #    not user-listable even though individual files inside are
-      #    readable, so a glob silently expands to nothing.
-      echo ">>> import OpenVPN profiles"
-      for name in openvpn-tg-prod openvpn-tg-dev; do
-        ovpn="/run/secrets/$name.ovpn"
-        if [ ! -r "$ovpn" ]; then
-          echo "    $name: source missing at $ovpn, skipping"
-          continue
-        fi
-        if nmcli -t -f NAME connection show 2>/dev/null | grep -qx "$name"; then
-          echo "    $name already imported"
-        else
-          echo "    importing $name"
-          nmcli connection import type openvpn file "$ovpn" \
-            || echo "    !! import of $name failed (continuing)"
-        fi
-      done
+      # OVPN→NM import is now handled by the openvpn-nm-import systemd unit
+      # in modules/nixos/openvpn.nix — runs idempotently on every boot, no
+      # manual step required for fresh hosts.
 
       echo "=== bootstrap done ==="
     '';
