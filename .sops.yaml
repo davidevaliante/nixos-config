@@ -7,7 +7,7 @@ keys:
   - &host_hydrogen  age19w4ecgrxgnelsdcnn26xfu8mkgrypmuxmgftccu5gt6ug64w3qfqvqdmpz
   # Placeholder — substituted on helium's first boot by scripts/sops-bootstrap.sh
   # using the host's age pubkey derived from /etc/ssh/ssh_host_ed25519_key.pub.
-  - &host_helium    age1REPLACE_WITH_HOST_helium_PUBKEY
+  - &host_helium    age10gh2knkk4rjhqhsfxt7y559h8uq8lkuegr2gq59jckqvet29mspqe6904g
 
 creation_rules:
   - path_regex: secrets/common/[^/]+\.yaml$
