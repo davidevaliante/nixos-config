@@ -80,17 +80,14 @@ in
     # ensures it's the last block in kitty.conf so the cursor override
     # actually wins.
     extraConfig = lib.mkAfter ''
-      # Match Telescope's float bg (oxocarbon's `blend` = #131313), one shade
-      # darker than oxocarbon base00 (#161616). Stylix's appended base16
-      # include sets `background #base00`, so this needs mkAfter to win.
+      # Pinned to oxocarbon's `blend` (#131313) so kitty bg, nvim editor bg,
+      # and Telescope's float bg are all visually uniform. Stylix's appended
+      # base16 include sets `background #base00`, so this needs mkAfter to win.
       background              #131313
       cursor                  #${c.base09}
       cursor_text_color       #${c.base00}
-      # Active tab = green text, inactive = muted gray.
-      # All three backgrounds (active cell, inactive cell, tab-bar gutter)
-      # are pinned to the terminal bg so the tab area is visually flat —
-      # otherwise stylix's defaults leave the tab_bar_background slightly
-      # different from the per-tab backgrounds.
+      # Active tab = green text, inactive = muted gray. Tab backgrounds match
+      # the terminal bg so the tab gutter stays visually flat.
       active_tab_foreground   #${c.base0B}
       active_tab_background   #131313
       inactive_tab_foreground #${c.base03}
