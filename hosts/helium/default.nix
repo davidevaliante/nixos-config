@@ -24,6 +24,10 @@
     ../../modules/nixos/graphics/nvidia.nix
   ];
 
+  # os-prober mounts NTFS to confirm a partition is Windows; without
+  # ntfs support it silently skips the Windows disk.
+  boot.supportedFilesystems = [ "ntfs" ];
+
   # GRUB + os-prober. systemd-boot can't see Windows on a separate disk's
   # ESP, but os-prober scans every mounted filesystem cross-disk and
   # auto-adds a Windows entry — gives a unified boot menu without F11/F12.
