@@ -40,6 +40,10 @@
             content = {
               type = "luks";
               name = "cryptroot";
+              # askPassword: triggers an interactive prompt during disko
+              # destroy/format/mount. Without it disko's scripts read
+              # $password before it's set and abort under `set -u`.
+              askPassword = true;
               # discards: needed for SSD TRIM through LUKS. Tiny security
               # tradeoff (leaks block usage patterns) — acceptable for a
               # daily driver, not for a covert-channel-sensitive deployment.
