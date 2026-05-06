@@ -32,9 +32,28 @@
       # placeholder; swap in a different `nodejs_*` to demonstrate the
       # per-project isolation.
       fe-stack = pkgs.mkShell {
+        # Tauri's Rust crates link system libs at build time — pkg-config
+        # needs to find their .pc files, which on NixOS only land in
+        # PKG_CONFIG_PATH when the dev outputs are pulled into a shell.
+        nativeBuildInputs = with pkgs; [ pkg-config ];
+        buildInputs = with pkgs; [
+          glib
+          gtk3
+          webkitgtk_4_1   # Tauri v2 targets webkit2gtk-4.1
+          libsoup_3
+          librsvg
+          cairo
+          pango
+          gdk-pixbuf
+          atk
+          openssl
+        ];
+
         packages = with pkgs; [
           nodejs_24
           corepack_24   # activates pnpm/yarn pinned via package.json packageManager
+          cargo
+          rustc
         ];
 
         shellHook = ''
