@@ -1,4 +1,8 @@
-{ pkgs, osConfig, ... }:
+{ pkgs, lib, osConfig, ... }:
+
+let
+  host = osConfig.networking.hostName;
+in
 
 {
   imports = [ ./niri-keybinds.nix ];
@@ -6,6 +10,23 @@
   programs.niri.settings = {
     prefer-no-csd = true;
     hotkey-overlay.skip-at-startup = true;
+
+    # Per-host outputs. Without an explicit mode, niri picks the EDID-
+    # preferred entry — which on helium's ultrawide is 60Hz even though
+    # the panel does 144Hz. Hydrogen has different displays; leave its
+    # outputs empty here and add a block when needed.
+    outputs = lib.optionalAttrs (host == "helium") {
+      "DP-1" = {
+        mode = { width = 3440; height = 1440; refresh = 144.000; };
+        position = { x = 0; y = 0; };
+        scale = 1.0;
+      };
+      "DP-2" = {
+        mode = { width = 1920; height = 1080; refresh = 60.000; };
+        position = { x = 3440; y = 0; };
+        scale = 1.0;
+      };
+    };
 
     input = {
       keyboard.xkb.layout = "us";
