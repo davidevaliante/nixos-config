@@ -17,6 +17,7 @@
     ../../modules/nixos/stylix.nix
     ../../modules/nixos/sops.nix
     ../../modules/nixos/aws.nix
+    ../../modules/nixos/authenticator.nix
     ../../modules/nixos/openvpn.nix
     ../../modules/nixos/rquickshare.nix
     ../../modules/nixos/thunar.nix
