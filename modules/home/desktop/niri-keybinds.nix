@@ -38,6 +38,16 @@ in
     "Mod+Shift+J"  = { action.move-window-down = [ ];   hotkey-overlay.title = "Move window down"; };
     "Mod+Shift+K"  = { action.move-window-up = [ ];     hotkey-overlay.title = "Move window up"; };
 
+    "Mod+Left"         = { action.focus-monitor-left = [ ];           hotkey-overlay.title = "Focus monitor left"; };
+    "Mod+Right"        = { action.focus-monitor-right = [ ];          hotkey-overlay.title = "Focus monitor right"; };
+    "Mod+Down"         = { action.focus-monitor-down = [ ];           hotkey-overlay.title = "Focus monitor down"; };
+    "Mod+Up"           = { action.focus-monitor-up = [ ];             hotkey-overlay.title = "Focus monitor up"; };
+
+    "Mod+Shift+Left"   = { action.move-column-to-monitor-left = [ ];  hotkey-overlay.title = "Move column to monitor left"; };
+    "Mod+Shift+Right"  = { action.move-column-to-monitor-right = [ ]; hotkey-overlay.title = "Move column to monitor right"; };
+    "Mod+Shift+Down"   = { action.move-column-to-monitor-down = [ ];  hotkey-overlay.title = "Move column to monitor down"; };
+    "Mod+Shift+Up"     = { action.move-column-to-monitor-up = [ ];    hotkey-overlay.title = "Move column to monitor up"; };
+
     "Mod+1" = { action.focus-workspace = [ 1 ]; hotkey-overlay.title = "Focus workspace 1"; };
     "Mod+2" = { action.focus-workspace = [ 2 ]; hotkey-overlay.title = "Focus workspace 2"; };
     "Mod+3" = { action.focus-workspace = [ 3 ]; hotkey-overlay.title = "Focus workspace 3"; };

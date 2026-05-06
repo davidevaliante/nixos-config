@@ -111,5 +111,6 @@
     git
     wget
     libnotify
+    unzip
   ];
 }
