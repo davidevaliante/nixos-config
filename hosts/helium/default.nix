@@ -28,6 +28,12 @@
   # ntfs support it silently skips the Windows disk.
   boot.supportedFilesystems = [ "ntfs" ];
 
+  # AM4 / Ryzen 5000 desktops frequently hang on S3 deep-sleep resume
+  # (kernel logs "suspend entry (deep)" with no matching resume). Force
+  # s2idle so /sys/power/mem_sleep defaults to the working mode; tradeoff
+  # is slightly higher idle power than S3.
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+
   # GRUB + os-prober. systemd-boot can't see Windows on a separate disk's
   # ESP, but os-prober scans every mounted filesystem cross-disk and
   # auto-adds a Windows entry — gives a unified boot menu without F11/F12.
