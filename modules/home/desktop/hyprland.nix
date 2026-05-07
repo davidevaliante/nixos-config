@@ -2,6 +2,8 @@
 
 let
   c = config.lib.stylix.colors;
+  host = osConfig.networking.hostName;
+  mouseSensitivity = if host == "helium" then -0.5 else 0;
 in
 {
   imports = [ ./hyprland-keybinds.nix ];
@@ -20,7 +22,7 @@ in
       input = {
         kb_layout = "us";
         follow_mouse = 1;
-        sensitivity = 0;
+        sensitivity = mouseSensitivity;
         touchpad = {
           natural_scroll = true;
           tap-to-click = true;

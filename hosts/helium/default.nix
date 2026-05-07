@@ -48,5 +48,10 @@
 
   networking.hostName = "helium";
 
+  # The desk mouse on helium reports very high counts-per-inch; slow it
+  # down at the libinput layer so X11/Xwayland clients match the Wayland
+  # compositor settings (Hyprland/Niri set their own accel-speed too).
+  services.libinput.mouse.accelSpeed = "-0.5";
+
   system.stateVersion = "25.11";
 }

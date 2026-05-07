@@ -34,6 +34,7 @@ in
         natural-scroll = true;
         tap = true;
       };
+      mouse.accel-speed = if host == "helium" then -0.5 else 0.0;
       focus-follows-mouse.enable = false;
     };
 
