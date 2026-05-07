@@ -67,6 +67,16 @@ in
         predefinedScheme = "Oxocarbon";
       };
 
+      # Idle pipeline: DPMS off → lock → suspend. Timeouts are absolute (each
+      # measured from the last input event), not additive — so lock fires 30
+      # min after idle started, not 30 min after the screen turned off.
+      idle = {
+        enabled = true;
+        screenOffTimeout = 15 * 60;
+        lockTimeout      = 30 * 60;
+        suspendTimeout   = 45 * 60;
+      };
+
       # Override the session menu's logout action.
       #
       # Noctalia's default logout calls `loginctl terminate-session`, which kills
