@@ -16,6 +16,15 @@ let
       "Bash(sops --decrypt *)"
       "Bash(sops -d *)"
       "Bash(bluetoothctl devices *)"
+      "Bash(git *)"
+      "Bash(npm *)"
+      "Bash(air *)"
+      "Bash(ls*)"
+      "Read"
+    ];
+
+    permissions.deny = [
+      "Bash(git push *)"
     ];
   };
 in
