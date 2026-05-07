@@ -53,6 +53,12 @@
   # GPU acceleration.
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
+  # Pull in `linux-firmware`, which carries the closed-source-but-redistributable
+  # blobs required by USB BT dongles (e.g. TP-Link UB500 → rtl_bt/rtl8761bu_fw.bin),
+  # most Wi-Fi cards, and AMD/Intel GPU microcode. Without this, `btusb` brings
+  # the device up but firmware load fails with -ENOENT and hci0 never works.
+  hardware.enableRedistributableFirmware = true;
+
   # Bluetooth — pipewire handles audio routing for BT headphones automatically
   # (LDAC/AAC/aptX work on modern wireplumber). Pairing happens via noctalia's
   # bluetooth panel; no `blueman` GUI needed.
