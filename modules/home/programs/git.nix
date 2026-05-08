@@ -39,6 +39,8 @@
       "flake.lock"
       ".envrc"
       ".direnv/"
+      "CLAUDE.md"
+      ".claude/"
     ];
   };
 }

@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 
 {
   imports = [
@@ -58,6 +58,31 @@
   # down at the libinput layer so X11/Xwayland clients match the Wayland
   # compositor settings (Hyprland/Niri set their own accel-speed too).
   services.libinput.mouse.accelSpeed = "-0.1";
+
+  # The ASUS Aura onboard RGB controller (0b05:1939, sits on usb1 port 6)
+  # gets wedged by the suspend cycle: on the next boot it stops answering
+  # descriptor reads and the kernel retries for ~65 s, blocking the
+  # initrd→sysroot udev handoff (visible as a "Stop Job is running for
+  # Rule-based Manager…" message). Unbind it before sleep so the device
+  # is detached cleanly and isn't dragged through suspend.
+  systemd.services.unbind-asus-aura-pre-sleep = {
+    description = "Unbind ASUS Aura USB controller before suspend";
+    before = [ "sleep.target" ];
+    wantedBy = [ "sleep.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "unbind-asus-aura" ''
+        set -eu
+        for d in /sys/bus/usb/devices/*; do
+          [ -e "$d/idVendor" ] || continue
+          if [ "$(cat "$d/idVendor")" = "0b05" ] \
+             && [ "$(cat "$d/idProduct")" = "1939" ]; then
+            echo "$(basename "$d")" > /sys/bus/usb/drivers/usb/unbind || true
+          fi
+        done
+      '';
+    };
+  };
 
   system.stateVersion = "25.11";
 }
