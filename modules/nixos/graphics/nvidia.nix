@@ -21,6 +21,14 @@
 
     nvidiaSettings = true;
 
+    # Without this, VRAM contents are lost across suspend and the GPU comes
+    # back with no valid framebuffer — the symptom is a Wayland session that
+    # can't repaint after resume (monitor cycles on/off, fan audible, no
+    # image). Enabling this sets NVreg_PreserveVideoMemoryAllocations=1 and
+    # wires up nvidia-suspend/nvidia-resume.service to snapshot VRAM to
+    # /tmp/nvidia and restore it on wake.
+    powerManagement.enable = true;
+
     # Pin to the stable production driver. Switch to `production` for newer
     # GPUs or `beta` only if a specific bug fix requires it.
     package = config.boot.kernelPackages.nvidiaPackages.stable;

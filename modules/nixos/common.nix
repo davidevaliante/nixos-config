@@ -19,6 +19,13 @@
     ];
   };
 
+  # Wipe /tmp at boot. Default is `false` (preserves /tmp across reboots),
+  # which lets orphaned files accumulate — notably NVIDIA's VRAM snapshot
+  # written by nvidia-suspend.service when resume fails before the driver
+  # can delete it (multi-GB on a 3060 Ti). Cheap insurance against any
+  # crashed-process leftover, not just NVIDIA.
+  boot.tmp.cleanOnBoot = true;
+
   time.timeZone = "Europe/Rome";
 
   i18n.defaultLocale = "en_US.UTF-8";

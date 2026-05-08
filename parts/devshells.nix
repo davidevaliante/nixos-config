@@ -67,6 +67,115 @@
 
         doCheck = false;
       };
+
+      # Factory for per-environment EKS shells. Pins the toolchain, binds an
+      # AWS profile + EKS context, and binds a NetworkManager VPN connection
+      # via real wrapper scripts so the three things that have to agree
+      # (cwd / profile / VPN) stay in sync.
+      #
+      # Why scripts and not shellHook functions: bash functions defined in a
+      # shellHook don't reliably survive nix-direnv → zsh. Wrappers built
+      # with writeShellScriptBin are real binaries on PATH that shadow the
+      # underlying tools (and stay defined as commands, not functions).
+      mkEksShell =
+        {
+          name,
+          awsProfile, # string, or null to leave AWS_PROFILE unset (= default)
+          vpnName, # NetworkManager connection name
+          kubeCtxArn, # full EKS cluster ARN to pin as current-context
+        }:
+        let
+          nmcli = "${pkgs.networkmanager}/bin/nmcli";
+
+          # Refuses to run the wrapped tool unless the matching VPN
+          # connection is active. Inline the check rather than calling a
+          # helper so the wrapper has zero runtime dependencies on the
+          # shellHook having been sourced.
+          guarded =
+            { name, realBin }:
+            pkgs.writeShellScriptBin name ''
+              if ! ${nmcli} -t -f NAME connection show --active 2>/dev/null | grep -qx "${vpnName}"; then
+                printf '\033[1;31m!! VPN ${vpnName} is NOT active — refusing to run %s.\033[0m  Run: tg-vpn-up\n' "${name}" >&2
+                exit 1
+              fi
+              exec ${realBin} "$@"
+            '';
+
+          # Standalone helpers exposed as binaries so they're callable from
+          # any shell (zsh/bash/fish) regardless of how direnv exports.
+          tg-vpn-up = pkgs.writeShellScriptBin "tg-vpn-up" ''
+            exec ${nmcli} connection up "${vpnName}" "$@"
+          '';
+          tg-vpn-down = pkgs.writeShellScriptBin "tg-vpn-down" ''
+            exec ${nmcli} connection down "${vpnName}" "$@"
+          '';
+          tg-status = pkgs.writeShellScriptBin "tg-status" ''
+            printf '%s — AWS_PROFILE=%s, ctx %s\n' "${name}" "''${AWS_PROFILE:-default}" "${kubeCtxArn}"
+            if ${nmcli} -t -f NAME connection show --active 2>/dev/null | grep -qx "${vpnName}"; then
+              printf 'VPN ${vpnName}: active\n'
+            else
+              printf 'VPN ${vpnName}: NOT active (run: tg-vpn-up)\n'
+            fi
+          '';
+        in
+        pkgs.mkShell {
+          inherit name;
+          # Wrapper bins go FIRST so they shadow the unguarded versions in
+          # PATH. kubectl/aws/eksctl are intentionally not wrapped — they
+          # have plenty of subcommands that don't need the VPN (kubectx
+          # config edits, `aws configure list`, etc.) and over-blocking
+          # them is more annoying than helpful.
+          packages = [
+            (guarded {
+              name = "tofu";
+              realBin = "${pkgs-opentofu.opentofu}/bin/tofu";
+            })
+            tg-vpn-up
+            tg-vpn-down
+            tg-status
+            pkgs.awscli2
+            pkgs-kubectl.kubectl
+            pkgs.eksctl
+            pkgs-opentofu.opentofu
+            pkgs.kubectx
+            pkgs.fzf
+            pkgs.networkmanager
+          ];
+
+          shellHook = ''
+            ${
+              if awsProfile == null then
+                ''unset AWS_PROFILE''
+              else
+                ''export AWS_PROFILE="${awsProfile}"''
+            }
+
+            # Directory-scoped kubectl context override. Layer a per-env
+            # override file (only `current-context`) on top of ~/.kube/config
+            # via KUBECONFIG so this shell defaults to its own cluster
+            # without mutating the global config. Overwritten on entry so
+            # the env's default really is the default; `kubectx` writes
+            # land in the override file (first in KUBECONFIG) and are
+            # reset on re-entry.
+            CTX_FILE="$PWD/.direnv/kubeconfig-ctx"
+            mkdir -p "$(dirname "$CTX_FILE")"
+            cat > "$CTX_FILE" <<EOF
+            apiVersion: v1
+            kind: Config
+            clusters: []
+            contexts: []
+            users: []
+            current-context: ${kubeCtxArn}
+            EOF
+            export KUBECONFIG="$CTX_FILE:$HOME/.kube/config"
+
+            # Entry-time warning — wrapper still blocks execution, this is
+            # just so a bare `cd` (no chained command) flags the problem.
+            if ! ${nmcli} -t -f NAME connection show --active 2>/dev/null | grep -qx "${vpnName}"; then
+              printf '\033[1;31m!! VPN ${vpnName} is NOT active.\033[0m  Run: tg-vpn-up\n' >&2
+            fi
+          '';
+        };
     in
     {
       devShells = {
@@ -127,49 +236,29 @@
           '';
         };
 
-        # Shell for topgaming/eks — terraform/opentofu state lives in this
-        # repo and the runbook in readme.md drives EKS via aws + kubectl.
-        # Pinning the toolchain here keeps `tofu apply` reproducible across
-        # hydrogen/helium instead of leaning on whatever's globally installed.
-        topgaming-eks = pkgs.mkShell {
-          name = "topgaming-eks";
-          packages = [
-            pkgs.awscli2
-            pkgs-kubectl.kubectl
-            pkgs.eksctl
-            pkgs-opentofu.opentofu
-            # kubectx + kubens for quick context/namespace switching.
-            # Auto-uses fzf for interactive picking when fzf is on PATH.
-            pkgs.kubectx
-            pkgs.fzf
-          ];
+        # Shells for topgaming/eks — one per environment. Each pins the same
+        # toolchain (aws/kubectl/tofu/eksctl) but binds an AWS profile, an
+        # EKS context, and the matching OpenVPN connection together so a
+        # `tofu plan` from the wrong directory can't quietly hit the wrong
+        # account or run unprotected from the VPN.
+        #
+        # Wire them up in the eks repo with one .envrc per env:
+        #   eks/dev/terraform/.envrc   →  use flake ~/nixos-config#tg-eks-dev
+        #   eks/prod/terraform/.envrc  →  use flake ~/nixos-config#tg-eks-prod
+        # then `direnv allow` once per directory.
+        tg-eks-dev = mkEksShell {
+          name = "tg-eks-dev";
+          awsProfile = null; # unset = the implicit `default` profile
+          vpnName = "openvpn-tg-dev";
+          kubeCtxArn = "arn:aws:eks:eu-central-1:530145339946:cluster/dev-eks";
+        };
 
-          shellHook = ''
-            # Directory-scoped default kubectl context. Layer a per-project
-            # override file (only `current-context`) on top of ~/.kube/config
-            # via KUBECONFIG so this shell defaults to dev-eks without
-            # mutating the global config that other terminals share.
-            # Always overwritten on entry so "default" really is the default;
-            # use `kubectx` inside the shell to flip — those writes land in
-            # the override file (first in KUBECONFIG) and are reset on
-            # re-entry.
-            # Caveat: `aws eks update-kubeconfig` would write to the first
-            # file in KUBECONFIG. Pass `--kubeconfig ~/.kube/config` when
-            # updating the global config from inside this shell.
-            CTX_FILE="$PWD/.direnv/kubeconfig-ctx"
-            mkdir -p "$(dirname "$CTX_FILE")"
-            cat > "$CTX_FILE" <<'EOF'
-            apiVersion: v1
-            kind: Config
-            clusters: []
-            contexts: []
-            users: []
-            current-context: arn:aws:eks:eu-central-1:530145339946:cluster/dev-eks
-            EOF
-            export KUBECONFIG="$CTX_FILE:$HOME/.kube/config"
-
-            echo "topgaming-eks devshell — aws $(aws --version 2>&1 | awk '{print $1}'), kubectl $(kubectl version --client 2>/dev/null | awk '/Client Version/{print $3}'), tofu $(tofu version | awk 'NR==1{print $2}'), ctx $(kubectl config current-context 2>/dev/null || echo unset)"
-          '';
+        tg-eks-prod = mkEksShell {
+          name = "tg-eks-prod";
+          awsProfile = "tg-prod-0"; # matches `[profile tg-prod-0]` in ~/.aws/config
+          vpnName = "openvpn-tg-prod";
+          # TODO: confirm the prod cluster ARN — guessed by analogy with dev.
+          kubeCtxArn = "arn:aws:eks:eu-central-1:530145339946:cluster/prod-eks";
         };
 
         test-shell = pkgs.mkShell {

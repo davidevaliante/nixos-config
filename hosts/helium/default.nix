@@ -60,15 +60,17 @@
   services.libinput.mouse.accelSpeed = "-0.1";
 
   # The ASUS Aura onboard RGB controller (0b05:1939, sits on usb1 port 6)
-  # gets wedged by the suspend cycle: on the next boot it stops answering
-  # descriptor reads and the kernel retries for ~65 s, blocking the
-  # initrd→sysroot udev handoff (visible as a "Stop Job is running for
-  # Rule-based Manager…" message). Unbind it before sleep so the device
-  # is detached cleanly and isn't dragged through suspend.
-  systemd.services.unbind-asus-aura-pre-sleep = {
-    description = "Unbind ASUS Aura USB controller before suspend";
-    before = [ "sleep.target" ];
-    wantedBy = [ "sleep.target" ];
+  # gets wedged by suspend AND shutdown/reboot: on the next boot it stops
+  # answering descriptor reads and the kernel retries for ~65 s, blocking
+  # the initrd→sysroot udev handoff (visible as a "Stop Job is running for
+  # Rule-based Manager…" message, with `usb 1-6: device descriptor
+  # read/64, error -110` in dmesg). Unbind it before both sleep and
+  # shutdown so the device is detached cleanly and isn't dragged through
+  # the power transition.
+  systemd.services.unbind-asus-aura = {
+    description = "Unbind ASUS Aura USB controller before suspend/shutdown";
+    before = [ "sleep.target" "shutdown.target" ];
+    wantedBy = [ "sleep.target" "shutdown.target" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "unbind-asus-aura" ''
