@@ -437,6 +437,23 @@
         "type": "github"
       }
     },
+    "prng": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1680688378,
+        "narHash": "sha256-ASQWRfo8nFYhlsQyLp2voIphk9XRoV2sukq/djenqp0=",
+        "ref": "master",
+        "rev": "31d142aea225307f8c6ab307dc107a83df4469a0",
+        "revCount": 14,
+        "type": "git",
+        "url": "ssh://git-codecommit.eu-central-1.amazonaws.com/v1/repos/prng"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git-codecommit.eu-central-1.amazonaws.com/v1/repos/prng"
+      }
+    },
     "root": {
       "inputs": {
         "disko": "disko",
@@ -450,6 +467,7 @@
         "noctalia": "noctalia",
         "noctalia-clipper": "noctalia-clipper",
         "noctalia-plugins": "noctalia-plugins",
+        "prng": "prng",
         "sops-nix": "sops-nix",
         "stylix": "stylix"
       }

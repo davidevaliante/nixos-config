@@ -69,6 +69,16 @@
       url = "github:blackbartblues/noctalia-clipper";
       flake = false;
     };
+
+    # Source for libprng — the cgo shared library that game-service links
+    # against. Private AWS CodeCommit repo, so flake eval requires SSH/AWS
+    # credentials (the lockfile only stores a commit hash, no creds).
+    prng = {
+      # ref=master is required: AWS CodeCommit doesn't expose a default
+      # branch over SSH the way GitHub does, so nix can't auto-discover it.
+      url = "git+ssh://git-codecommit.eu-central-1.amazonaws.com/v1/repos/prng?ref=master";
+      flake = false;
+    };
   };
 
   outputs =

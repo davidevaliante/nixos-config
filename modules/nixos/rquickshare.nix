@@ -14,5 +14,5 @@
   # least-bad option: pairing only happens on the LAN, and the firewall still
   # blocks everything from the internet side. If you regularly join networks
   # you don't trust, drop these and selectively open ports on the day instead.
-  networking.firewall.trustedInterfaces = [ "wlo1" "enp3s0" ];
+  networking.firewall.trustedInterfaces = [ "wlo1" "enp3s0" "enp7s0" ];
 }
