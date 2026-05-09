@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   cfg = config.mySystem.desktop;
@@ -52,7 +58,7 @@ in
         {
           id = "VPN";
           displayMode = "alwaysShow"; # always show the pill, not just on hover
-          iconColor = "tertiary";     # purple in Oxocarbon
+          iconColor = "tertiary"; # purple in Oxocarbon
           textColor = "tertiary";
         }
         { id = "Battery"; }
@@ -73,8 +79,8 @@ in
       idle = {
         enabled = true;
         screenOffTimeout = 15 * 60;
-        lockTimeout      = 30 * 60;
-        suspendTimeout   = 45 * 60;
+        lockTimeout = 30 * 60;
+        suspendTimeout = 2 * 60 * 60;
       };
 
       # Override the session menu's logout action.
@@ -88,12 +94,48 @@ in
       # `command` fall through to noctalia's defaults) so the menu still shows
       # every option — overriding only `logout`.
       sessionMenu.powerOptions = lib.mkForce [
-        { action = "lock";            enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
-        { action = "suspend";         enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
-        { action = "hibernate";       enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
-        { action = "reboot";          enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
-        { action = "userspaceReboot"; enabled = false; countdownEnabled = true; command = ""; keybind = ""; }
-        { action = "rebootToUefi";    enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        {
+          action = "lock";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
+        {
+          action = "suspend";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
+        {
+          action = "hibernate";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
+        {
+          action = "reboot";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
+        {
+          action = "userspaceReboot";
+          enabled = false;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
+        {
+          action = "rebootToUefi";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
         {
           action = "logout";
           enabled = true;
@@ -101,7 +143,13 @@ in
           command = "case $XDG_CURRENT_DESKTOP in niri) niri msg action quit -s ;; Hyprland) hyprctl dispatch exit ;; esac";
           keybind = "";
         }
-        { action = "shutdown";        enabled = true;  countdownEnabled = true; command = ""; keybind = ""; }
+        {
+          action = "shutdown";
+          enabled = true;
+          countdownEnabled = true;
+          command = "";
+          keybind = "";
+        }
       ];
     };
 
@@ -177,9 +225,7 @@ in
 
   # Noctalia's home module no longer manages a systemd unit (deprecated upstream),
   # so the shell must be launched from each compositor's autostart.
-  wayland.windowManager.hyprland.settings.exec-once =
-    lib.mkIf active [ "noctalia-shell" ];
+  wayland.windowManager.hyprland.settings.exec-once = lib.mkIf active [ "noctalia-shell" ];
 
-  programs.niri.settings.spawn-at-startup =
-    lib.mkIf active [ { command = [ "noctalia-shell" ]; } ];
+  programs.niri.settings.spawn-at-startup = lib.mkIf active [ { command = [ "noctalia-shell" ]; } ];
 }
