@@ -22,6 +22,7 @@
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/nvidia.nix
+    ../../modules/nixos/cosmo.nix
   ];
 
   # os-prober mounts NTFS to confirm a partition is Windows; without

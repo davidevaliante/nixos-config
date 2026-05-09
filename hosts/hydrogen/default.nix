@@ -16,6 +16,7 @@
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/intel.nix
+    ../../modules/nixos/cosmo.nix
   ];
 
   boot.loader.systemd-boot = {
