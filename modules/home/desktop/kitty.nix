@@ -74,6 +74,7 @@ in
     keybindings = {
       "ctrl+shift+v" = "paste_from_clipboard";
       "ctrl+shift+c" = "copy_to_clipboard";
+      "ctrl+shift+t" = "new_tab_with_cwd";
     };
 
     # Must come after stylix's `include base16-...conf` line; mkAfter
