@@ -17,6 +17,14 @@ let
   # every HM rebuild so the next shell start always re-parses.
   cheatsheetCache = "$HOME/.config/noctalia/plugins/keybind-cheatsheet/settings.json";
 
+  # Qt persists compiled QML bytecode here, keyed by file path. Plugins
+  # symlinked from /nix/store change content on every rebuild but keep the
+  # same ~/.config path — so Qt happily serves stale bytecode and ignores
+  # property changes (e.g. an updated `icon:` string renders as the
+  # default-fallback skull). Wipe the cache on every reload and rebuild so
+  # the new sources actually take effect.
+  qmlCacheDir = "$HOME/.cache/noctalia-qs/qmlcache";
+
   # Region screenshot → Litterbox (1h temp host) → Google Lens by URL.
   # Lens has no public unauthenticated upload endpoint that's stable from a
   # shell client, so we round-trip through a temp host the same way
@@ -65,6 +73,7 @@ let
         "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
         && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
     fi
+    rm -rf "${qmlCacheDir}"
     setsid noctalia-shell </dev/null >/dev/null 2>&1 &
   '';
 in
@@ -296,6 +305,7 @@ in
           "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
           && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
       fi
+      rm -rf "${qmlCacheDir}"
     ''
   );
 
