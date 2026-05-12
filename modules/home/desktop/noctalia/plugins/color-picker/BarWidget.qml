@@ -16,7 +16,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name)
   applyUiScale: false
-  icon: "colorize"
+  icon: "color-picker"
   tooltipText: "Pick a color from the screen"
   tooltipDirection: BarService.getTooltipDirection(screen?.name)
   customRadius: Style.radiusL

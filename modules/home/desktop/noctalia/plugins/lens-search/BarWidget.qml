@@ -16,7 +16,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name)
   applyUiScale: false
-  icon: "image_search"
+  icon: "photo-search"
   tooltipText: "Search region with Google Lens"
   tooltipDirection: BarService.getTooltipDirection(screen?.name)
   customRadius: Style.radiusL
