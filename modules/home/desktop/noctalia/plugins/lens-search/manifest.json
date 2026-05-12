@@ -1,0 +1,11 @@
+{
+  "id": "lens-search",
+  "name": "Lens Search",
+  "version": "1.0.0",
+  "author": "davide",
+  "description": "Region screenshot uploaded to Google Lens via Litterbox.",
+  "tags": ["Bar", "Utility"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}

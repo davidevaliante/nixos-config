@@ -1,0 +1,11 @@
+{
+  "id": "color-picker",
+  "name": "Color Picker",
+  "version": "1.0.0",
+  "author": "davide",
+  "description": "Pick a pixel color from the screen via hyprpicker; result copied to clipboard.",
+  "tags": ["Bar", "Utility"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}

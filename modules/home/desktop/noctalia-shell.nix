@@ -17,6 +17,37 @@ let
   # every HM rebuild so the next shell start always re-parses.
   cheatsheetCache = "$HOME/.config/noctalia/plugins/keybind-cheatsheet/settings.json";
 
+  # Region screenshot → Litterbox (1h temp host) → Google Lens by URL.
+  # Lens has no public unauthenticated upload endpoint that's stable from a
+  # shell client, so we round-trip through a temp host the same way
+  # Snipping-Lens/QuickSnip do.
+  lensSearch = pkgs.writeShellScriptBin "lens-search" ''
+    set -eu
+    img=$(${pkgs.coreutils}/bin/mktemp --suffix=.png)
+    trap 'rm -f "$img"' EXIT
+    ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp)" "$img"
+    url=$(${pkgs.curl}/bin/curl -fsS \
+      -F "reqtype=fileupload" \
+      -F "time=1h" \
+      -F "fileToUpload=@$img" \
+      https://litterbox.catbox.moe/resources/internals/api.php) || url=""
+    if [ -z "$url" ] || [ "''${url#http}" = "$url" ]; then
+      ${pkgs.libnotify}/bin/notify-send -u critical "Lens search failed" "Upload to Litterbox failed"
+      exit 1
+    fi
+    ${pkgs.xdg-utils}/bin/xdg-open "https://lens.google.com/uploadbyurl?url=$url"
+  '';
+
+  # hyprpicker -a copies the hex to the Wayland clipboard and prints it.
+  # We surface the value as a notification so the user knows the pick landed.
+  colorPick = pkgs.writeShellScriptBin "color-pick" ''
+    set -eu
+    color=$(${pkgs.hyprpicker}/bin/hyprpicker -a -f hex || true)
+    if [ -n "''${color:-}" ]; then
+      ${pkgs.libnotify}/bin/notify-send "Color picked" "$color"
+    fi
+  '';
+
   noctaliaReload = pkgs.writeShellScriptBin "noctalia-reload" ''
     set -eu
     # The nix wrapper renames the process to `.quickshell-wra`, so we match
@@ -55,7 +86,8 @@ in
       bar.widgets.right = lib.mkForce [
         { id = "Tray"; }
         { id = "NotificationHistory"; }
-        { id = "plugin:screen-toolkit"; }
+        { id = "plugin:lens-search"; }
+        { id = "plugin:color-picker"; }
         {
           id = "VPN";
           displayMode = "alwaysShow"; # always show the pill, not just on hover
@@ -175,9 +207,13 @@ in
           enabled = true;
           sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
         };
-        screen-toolkit = {
+        lens-search = {
           enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+          sourceUrl = "local";
+        };
+        color-picker = {
+          enabled = true;
+          sourceUrl = "local";
         };
         clipper = {
           enabled = true;
@@ -187,9 +223,9 @@ in
     };
   };
 
-  # Ship plugins straight from the noctalia-plugins flake input
-  # (single-source-of-truth for plugin code), plus the custom Oxocarbon
-  # colorscheme (noctalia scans this dir with `find -L`, so symlinks work).
+  # Ship plugins from three sources: the upstream noctalia-plugins flake
+  # input (keybind-cheatsheet), the third-party clipper input, and locally
+  # authored plugins under ./noctalia/plugins (lens-search, color-picker).
   # `recursive = true` keeps the plugin directory a real, writable folder
   # (each file inside is its own symlink) so noctalia can persist per-plugin
   # settings.json. With a single dir-level symlink to the read-only store,
@@ -200,8 +236,13 @@ in
     recursive = true;
   };
 
-  xdg.configFile."noctalia/plugins/screen-toolkit" = lib.mkIf active {
-    source = "${inputs.noctalia-plugins}/screen-toolkit";
+  xdg.configFile."noctalia/plugins/lens-search" = lib.mkIf active {
+    source = ./noctalia/plugins/lens-search;
+    recursive = true;
+  };
+
+  xdg.configFile."noctalia/plugins/color-picker" = lib.mkIf active {
+    source = ./noctalia/plugins/color-picker;
     recursive = true;
   };
 
@@ -214,7 +255,12 @@ in
     source = ./noctalia/colorschemes/Oxocarbon.json;
   };
 
-  home.packages = lib.mkIf active [ noctaliaReload ];
+  home.packages = lib.mkIf active [
+    noctaliaReload
+    lensSearch
+    colorPick
+    pkgs.hyprpicker
+  ];
 
   # Wipe the keybind-cheatsheet cache on every rebuild. The plugin only
   # re-parses when this is empty, so this guarantees the next noctalia
