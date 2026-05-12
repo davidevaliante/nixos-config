@@ -67,7 +67,13 @@ in
         { id = "Brightness"; }
         { id = "ControlCenter"; }
       ];
-      notifications.location = "bottom_right";
+      notifications = {
+        location = "bottom_right";
+        density = "compact";
+        lowUrgencyDuration = 2;
+        normalUrgencyDuration = 5;
+        criticalUrgencyDuration = 10;
+      };
       ui.fontDefault = lib.mkForce "0xProto Nerd Font";
       colorSchemes = {
         useWallpaperColors = false;
