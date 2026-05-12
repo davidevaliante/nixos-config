@@ -60,6 +60,8 @@ in
     bind = $mod, S, exec, hyprshot -m region -o ~/Pictures/Screenshots #"Screenshot region"
     bind = $mod SHIFT, S, exec, hyprshot -m window -o ~/Pictures/Screenshots #"Screenshot window"
     bind = $mod CTRL, S, exec, hyprshot -m output -o ~/Pictures/Screenshots #"Screenshot output"
+    bind = $mod SHIFT, C, exec, color-pick #"Pick color"
+    bind = $mod SHIFT, G, exec, lens-search #"Lens search (region)"
 
     # 7. System
     bind = $mod, escape, exec, ${cmdsStr.lock} #"Lock screen"

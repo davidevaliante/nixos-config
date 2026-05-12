@@ -262,6 +262,28 @@ in
     pkgs.hyprpicker
   ];
 
+  # Surface the helper scripts in fuzzel (and any other XDG launcher) so the
+  # user can invoke them without a dedicated keybind. NoDisplay=false so they
+  # show up in the launcher; Terminal=false so they don't pop a kitty window.
+  xdg.desktopEntries = lib.mkIf active {
+    lens-search = {
+      name = "Lens Search";
+      comment = "Region screenshot → Google Lens";
+      exec = "lens-search";
+      icon = "search";
+      terminal = false;
+      categories = [ "Utility" "Graphics" ];
+    };
+    color-pick = {
+      name = "Color Picker";
+      comment = "Pick a pixel color from the screen";
+      exec = "color-pick";
+      icon = "color-picker";
+      terminal = false;
+      categories = [ "Utility" "Graphics" ];
+    };
+  };
+
   # Wipe the keybind-cheatsheet cache on every rebuild. The plugin only
   # re-parses when this is empty, so this guarantees the next noctalia
   # start (whether via `noctalia-reload`, logout, or reboot) picks up new

@@ -81,6 +81,8 @@ in
 
     "Mod+S"        = { action.spawn-sh = [ screenshotRegion ]; hotkey-overlay.title = "Screenshot region"; };
     "Mod+Shift+S"  = { action.spawn-sh = [ screenshotFull ];   hotkey-overlay.title = "Screenshot full screen"; };
+    "Mod+Shift+C"  = { action.spawn = [ "color-pick" ];        hotkey-overlay.title = "Pick color"; };
+    "Mod+Shift+G"  = { action.spawn = [ "lens-search" ];       hotkey-overlay.title = "Lens search (region)"; };
 
     # VT switching — niri 25.08 has no native `change-vt` action, so we go
     # through systemd-logind's Seat.SwitchTo dbus method. Logind allows the
