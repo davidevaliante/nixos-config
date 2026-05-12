@@ -67,6 +67,7 @@ in
         { id = "Brightness"; }
         { id = "ControlCenter"; }
       ];
+      notifications.location = "bottom_right";
       ui.fontDefault = lib.mkForce "0xProto Nerd Font";
       colorSchemes = {
         useWallpaperColors = false;
