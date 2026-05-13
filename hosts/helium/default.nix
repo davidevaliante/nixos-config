@@ -61,31 +61,22 @@
   services.libinput.mouse.accelSpeed = "-0.1";
 
   # The ASUS Aura onboard RGB controller (0b05:1939, sits on usb1 port 6)
-  # gets wedged by suspend AND shutdown/reboot: on the next boot it stops
-  # answering descriptor reads and the kernel retries for ~65 s, blocking
-  # the initrd→sysroot udev handoff (visible as a "Stop Job is running for
-  # Rule-based Manager…" message, with `usb 1-6: device descriptor
-  # read/64, error -110` in dmesg). Unbind it before both sleep and
-  # shutdown so the device is detached cleanly and isn't dragged through
-  # the power transition.
-  systemd.services.unbind-asus-aura = {
-    description = "Unbind ASUS Aura USB controller before suspend/shutdown";
-    before = [ "sleep.target" "shutdown.target" ];
-    wantedBy = [ "sleep.target" "shutdown.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = pkgs.writeShellScript "unbind-asus-aura" ''
-        set -eu
-        for d in /sys/bus/usb/devices/*; do
-          [ -e "$d/idVendor" ] || continue
-          if [ "$(cat "$d/idVendor")" = "0b05" ] \
-             && [ "$(cat "$d/idProduct")" = "1939" ]; then
-            echo "$(basename "$d")" > /sys/bus/usb/drivers/usb/unbind || true
-          fi
-        done
-      '';
-    };
-  };
+  # gets wedged by power transitions: descriptor reads fail with
+  # `error -110` and the kernel retries for ~65 s, blocking initrd udev
+  # ("A stop job is running for Rule-based Manager…"). The previous
+  # unbind-on-shutdown service ran fine but the device kept re-enumerating
+  # on the next boot — and the shutdown-initrd phase still hit the wedge.
+  # Instead, de-authorize the device at first sight: with authorized=0
+  # the USB core never issues descriptor reads, so the wedge is invisible.
+  # Applied in both stage-1 initrd and the main system so the rule fires
+  # everywhere udev runs. Side-effect: no Aura RGB control on Linux —
+  # acceptable here, the controller isn't used.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0b05", ATTR{idProduct}=="1939", ATTR{authorized}="0"
+  '';
+  boot.initrd.services.udev.rules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0b05", ATTR{idProduct}=="1939", ATTR{authorized}="0"
+  '';
 
   system.stateVersion = "25.11";
 }

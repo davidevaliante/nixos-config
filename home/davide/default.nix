@@ -49,7 +49,13 @@
     localsend       # cross-platform LAN file transfer with Android
   ];
 
-  home.sessionVariables.BROWSER = "google-chrome-stable";
+  home.sessionVariables = {
+    BROWSER = "google-chrome-stable";
+    # Skip sum.golang.org for private CodeCommit repos — the public checksum DB
+    # can't see them and `go get` fails with a 404. Git-side SSH rewrites for
+    # this host live in modules/home/programs/git.nix.
+    GOPRIVATE = "git-codecommit.eu-central-1.amazonaws.com";
+  };
 
   xdg.mimeApps = {
     enable = true;
