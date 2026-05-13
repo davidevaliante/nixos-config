@@ -11,15 +11,17 @@ let
     name = "apidog-launch";
     runtimeInputs = with pkgs; [ apidog jq procps coreutils ];
     text = ''
-      class="Apidog"
+      # niri reports lowercase `apidog` as app_id; Hyprland reports the X11
+      # class which is also lowercase for this build. Match both.
+      class_re='^[Aa]pidog$'
 
       has_window() {
         if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ] && command -v hyprctl >/dev/null 2>&1; then
           hyprctl clients -j 2>/dev/null \
-            | jq -e --arg c "$class" '.[] | select(.class == $c)' >/dev/null
+            | jq -e --arg re "$class_re" '.[] | select(.class | test($re))' >/dev/null
         elif [ -n "''${NIRI_SOCKET:-}" ] && command -v niri >/dev/null 2>&1; then
           niri msg --json windows 2>/dev/null \
-            | jq -e --arg c "$class" '.[] | select(.app_id == $c)' >/dev/null
+            | jq -e --arg re "$class_re" '.[] | select(.app_id | test($re))' >/dev/null
         else
           return 1
         fi
@@ -27,11 +29,12 @@ let
 
       focus_window() {
         if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ] && command -v hyprctl >/dev/null 2>&1; then
-          hyprctl dispatch focuswindow "class:$class" >/dev/null || true
+          cls=$(hyprctl clients -j 2>/dev/null \
+            | jq -r --arg re "$class_re" '[.[] | select(.class | test($re))] | first.class // empty')
+          [ -n "$cls" ] && hyprctl dispatch focuswindow "class:$cls" >/dev/null || true
         elif [ -n "''${NIRI_SOCKET:-}" ] && command -v niri >/dev/null 2>&1; then
           id=$(niri msg --json windows 2>/dev/null \
-            | jq -r --arg c "$class" '.[] | select(.app_id == $c) | .id' \
-            | head -n1)
+            | jq -r --arg re "$class_re" '[.[] | select(.app_id | test($re))] | first.id // empty')
           [ -n "$id" ] && niri msg action focus-window --id "$id" >/dev/null || true
         fi
       }
@@ -40,12 +43,25 @@ let
         pgrep -f '/apidog( |$)' >/dev/null
       }
 
+      # Electron + Wayland flags. Without these, apidog tries the X11 Ozone
+      # backend, finds no $DISPLAY in the niri/Hyprland session, and SIGSEGVs
+      # during platform init — which is the actual "doesn't open" symptom.
+      # NIXOS_OZONE_WL is set globally but doesn't always propagate into the
+      # systemd scope launched by fuzzel, so we re-export it here.
+      export NIXOS_OZONE_WL=1
+      export ELECTRON_OZONE_PLATFORM_HINT=wayland
+      # shellcheck disable=SC2054  # commas here are part of a flag value
+      apidog_args=(
+        --ozone-platform-hint=auto
+        --enable-features=UseOzonePlatform,WaylandWindowDecorations
+      )
+
       if has_window; then
         focus_window
         # If a URL was passed (OAuth callback, etc.), still hand it off so
         # apidog's IPC delivers it to the running instance.
         if [ $# -gt 0 ]; then
-          exec apidog "$@"
+          exec apidog "''${apidog_args[@]}" "$@"
         fi
         exit 0
       fi
@@ -66,7 +82,7 @@ let
         "$HOME/.config/apidog/SingletonSocket" \
         "$HOME/.config/apidog/SingletonCookie"
 
-      exec apidog "$@"
+      exec apidog "''${apidog_args[@]}" "$@"
     '';
   };
 in
@@ -154,7 +170,9 @@ in
     # Required for OAuth callback (apidog://...) to route from Chrome back
     # into the running Apidog instance.
     mimeType = [ "x-scheme-handler/apidog" ];
-    settings.StartupWMClass = "Apidog";
+    # Under Wayland (Ozone), Electron reports a lowercase app_id. Match that
+    # so the compositor links the startup notification to the right window.
+    settings.StartupWMClass = "apidog";
   };
 
   mySystem.desktop.shell = "noctalia";

@@ -1,9 +1,15 @@
-{ pkgs, lib, config, osConfig, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  osConfig,
+  ...
+}:
 
 let
   c = config.lib.stylix.colors;
   host = osConfig.networking.hostName;
-  mouseSensitivity = if host == "helium" then -0.5 else 0;
+  mouseSensitivity = if host == "helium" then -0.1 else 0;
 in
 {
   imports = [ ./hyprland-keybinds.nix ];
@@ -35,7 +41,8 @@ in
         border_size = 3;
         layout = "dwindle";
 
-        "col.active_border" = lib.mkForce "rgba(${c.base0D}ee) rgba(${c.base0E}ee) rgba(${c.base0C}ee) 45deg";
+        "col.active_border" =
+          lib.mkForce "rgba(${c.base0D}ee) rgba(${c.base0E}ee) rgba(${c.base0C}ee) 45deg";
         "col.inactive_border" = lib.mkForce "rgba(${c.base02}aa)";
       };
 
