@@ -9,7 +9,7 @@
 let
   c = config.lib.stylix.colors;
   host = osConfig.networking.hostName;
-  mouseSensitivity = if host == "helium" then -0.1 else 0;
+  mouseSensitivity = if host == "helium" then 1.1 else 0;
 in
 {
   imports = [ ./hyprland-keybinds.nix ];
