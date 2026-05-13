@@ -143,12 +143,7 @@
           ];
 
           shellHook = ''
-            ${
-              if awsProfile == null then
-                ''unset AWS_PROFILE''
-              else
-                ''export AWS_PROFILE="${awsProfile}"''
-            }
+            ${if awsProfile == null then "unset AWS_PROFILE" else ''export AWS_PROFILE="${awsProfile}"''}
 
             # Directory-scoped kubectl context override. Layer a per-env
             # override file (only `current-context`) on top of ~/.kube/config
@@ -221,6 +216,7 @@
             go
             air
             pkg-config
+            lsof
           ];
 
           # cgo needs the header at compile time and the .so at link/run
