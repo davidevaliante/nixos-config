@@ -18,7 +18,7 @@
     ../../modules/nixos/sops.nix
     ../../modules/nixos/aws.nix
     ../../modules/nixos/openvpn.nix
-    ../../modules/nixos/rquickshare.nix
+    ../../modules/nixos/localsend.nix
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/nvidia.nix

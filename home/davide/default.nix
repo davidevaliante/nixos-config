@@ -46,22 +46,8 @@
     awscli2
 
     authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
-    rquickshare     # receive Android Quick Share to this laptop
+    localsend       # cross-platform LAN file transfer with Android
   ];
-
-  # rquickshare drops its own ~/.config/autostart/RQuickShare.desktop on first
-  # launch. Override it with Hidden=true so XDG autostart skips it — start the
-  # app manually when needed instead.
-  xdg.configFile."autostart/RQuickShare.desktop" = {
-    force = true;
-    text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=RQuickShare
-      Exec=rquickshare
-      Hidden=true
-    '';
-  };
 
   home.sessionVariables.BROWSER = "google-chrome-stable";
 
