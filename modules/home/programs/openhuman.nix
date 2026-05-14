@@ -129,6 +129,13 @@ in
     type = "Application";
     startupNotify = true;
     categories = [ "Utility" "Office" ];
+    # Required for the openhuman:// OAuth callback to route from Chrome back
+    # into the running app (matches the upstream AppImage's bundled .desktop).
+    mimeType = [ "x-scheme-handler/openhuman" ];
+  };
+
+  xdg.mimeApps.defaultApplications = {
+    "x-scheme-handler/openhuman" = "openhuman.desktop";
   };
 
   # OpenHuman's `cef-prewarm` spawns a "hidden warmup webview" (src/lib.rs:1066)
