@@ -246,15 +246,14 @@
           name = "tg-eks-dev";
           awsProfile = null; # unset = the implicit `default` profile
           vpnName = "openvpn-tg-dev";
-          kubeCtxArn = "arn:aws:eks:eu-central-1:530145339946:cluster/dev-eks";
+          kubeCtxArn = "arn:aws:eks:eu-central-1:713614461671:cluster/dev-eks";
         };
 
         tg-eks-prod = mkEksShell {
           name = "tg-eks-prod";
           awsProfile = "tg-prod-0"; # matches `[profile tg-prod-0]` in ~/.aws/config
           vpnName = "openvpn-tg-prod";
-          # TODO: confirm the prod cluster ARN — guessed by analogy with dev.
-          kubeCtxArn = "arn:aws:eks:eu-central-1:530145339946:cluster/prod-eks";
+          kubeCtxArn = "arn:aws:eks:eu-central-1:530145339946:cluster/prod-0-eks";
         };
 
         test-shell = pkgs.mkShell {
