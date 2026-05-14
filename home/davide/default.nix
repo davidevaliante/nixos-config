@@ -107,6 +107,7 @@ in
     ../../modules/home/programs/bootstrap.nix
     ../../modules/home/programs/obs.nix
     ../../modules/home/programs/claude-code.nix
+    ../../modules/home/programs/openhuman.nix
     ../../modules/home/xdg-cleanup.nix
     ../../modules/home/desktop
   ];
