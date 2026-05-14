@@ -69,9 +69,10 @@ let
     runtimeInputs = with pkgs; [ openhuman procps coreutils jq ];
     text = ''
       cef_dir="$HOME/.openhuman/users/local/cef"
-      # OpenHuman.desktop sets StartupWMClass=OpenHuman; niri/Hyprland report
-      # it case-sensitively. Match exactly.
-      class_re='^OpenHuman$'
+      # CEF under Ozone-Wayland leaves the toplevel app_id empty and only sets
+      # title, so app_id matching never fires. Match the main window by its
+      # title instead (the prewarm webview has both empty, so it won't match).
+      title_re='^OpenHuman'
 
       # CEF on Wayland with NVIDIA fails EGL context creation (EGL_BAD_ATTRIBUTE
       # loop from gl_context_egl.cc — the FHS bwrap can't reach nvidia's gbm
@@ -87,10 +88,10 @@ let
       has_window() {
         if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ] && command -v hyprctl >/dev/null 2>&1; then
           hyprctl clients -j 2>/dev/null \
-            | jq -e --arg re "$class_re" '.[] | select(.class | test($re))' >/dev/null
+            | jq -e --arg re "$title_re" '.[] | select(.title | test($re))' >/dev/null
         elif [ -n "''${NIRI_SOCKET:-}" ] && command -v niri >/dev/null 2>&1; then
           niri msg --json windows 2>/dev/null \
-            | jq -e --arg re "$class_re" '.[] | select(.app_id | test($re))' >/dev/null
+            | jq -e --arg re "$title_re" '.[] | select(.title // "" | test($re))' >/dev/null
         else
           return 1
         fi
