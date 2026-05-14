@@ -83,6 +83,44 @@ in
   programs.noctalia-shell = lib.mkIf active {
     enable = true;
 
+    # Patch Quickshell.Bluetooth's defaultAdapter binding to recover from
+    # USB hot-unplug / re-enumerate. Upstream's `Bluetooth.defaultAdapter`
+    # doesn't reliably re-fire `defaultAdapterChanged` for the replacement
+    # BlueZ object when a Bluetooth USB dongle is re-plugged (even on the
+    # same port) — the QML binding stays pinned to the now-dead adapter
+    # and the panel toggle becomes unresponsive until the shell is
+    # restarted via `noctalia-reload`. Fall back to scanning the live
+    # `Bluetooth.adapters` list every 2s so the UI rebinds automatically.
+    package =
+      let
+        upstream = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      in
+      upstream.overrideAttrs (old: {
+        # `installPhase` in noctalia's package.nix is custom and doesn't
+        # `runHook postInstall`, so we patch the source tree pre-install
+        # via `postPatch` instead.
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace Services/Networking/BluetoothService.qml \
+            --replace-fail \
+              'readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter' \
+              'property int _adapterRebindTick: 0
+          readonly property BluetoothAdapter adapter: {
+            _adapterRebindTick;
+            if (Bluetooth.defaultAdapter) return Bluetooth.defaultAdapter;
+            if (Bluetooth.adapters && Bluetooth.adapters.values && Bluetooth.adapters.values.length > 0)
+              return Bluetooth.adapters.values[0];
+            return null;
+          }
+          Timer {
+            id: adapterRebindTimer
+            interval: 2000
+            repeat: true
+            running: true
+            onTriggered: root._adapterRebindTick += 1
+          }'
+        '';
+      });
+
     settings = {
       # `useSeparateOpacity` decouples the bar's opacity from
       # `ui.panelBackgroundOpacity` (which stylix forces to 1.0 to keep

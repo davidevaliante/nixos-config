@@ -103,6 +103,7 @@ in
     ../../modules/home/programs/kubectl.nix
     ../../modules/home/programs/opentofu.nix
     ../../modules/home/programs/kubeconfig.nix
+    ../../modules/home/programs/tg-prod-push.nix
     ../../modules/home/programs/bootstrap.nix
     ../../modules/home/programs/obs.nix
     ../../modules/home/programs/claude-code.nix
