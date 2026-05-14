@@ -60,22 +60,26 @@
   # compositor settings (Hyprland/Niri set their own accel-speed too).
   services.libinput.mouse.accelSpeed = "-0.1";
 
-  # The ASUS Aura onboard RGB controller (0b05:1939, sits on usb1 port 6)
-  # gets wedged by power transitions: descriptor reads fail with
-  # `error -110` and the kernel retries for ~65 s, blocking initrd udev
-  # ("A stop job is running for Rule-based Manager…"). The previous
-  # unbind-on-shutdown service ran fine but the device kept re-enumerating
-  # on the next boot — and the shutdown-initrd phase still hit the wedge.
-  # Instead, de-authorize the device at first sight: with authorized=0
-  # the USB core never issues descriptor reads, so the wedge is invisible.
-  # Applied in both stage-1 initrd and the main system so the rule fires
-  # everywhere udev runs. Side-effect: no Aura RGB control on Linux —
-  # acceptable here, the controller isn't used.
+  # The ASUS Aura RGB controller on usb1 port 6 (0b05:1939) wedges on
+  # enumeration: descriptor reads fail with `error -110` and the kernel
+  # retries for ~85 s, blocking initrd udev ("A stop job is running for
+  # Rule-based Manager…"). The kernel reads descriptors in its own hub
+  # code path *before* udev sees the device, so a device-level rule
+  # (authorized=0 / unbind) fires too late — confirmed by the journal:
+  # the rule was installed yet the kernel still looped on error -110.
+  # The fix targets the *port* pseudo-device (`usb1-port6`), which the
+  # hub driver registers before it starts polling that port for connected
+  # devices, giving udev a window to disable the port at the xHCI level:
+  #   • disable=1     — takes the port offline, no enumeration attempted
+  #   • early_stop=yes — if disable races enumeration, give up after one
+  #                      failed try instead of looping ~85 s
+  # Applied in both stage-1 initrd and main udev. Side-effect: no Aura
+  # RGB control on Linux — acceptable, the controller isn't used.
   services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0b05", ATTR{idProduct}=="1939", ATTR{authorized}="0"
+    ACTION=="add", KERNEL=="usb1-port6", ATTR{early_stop}="yes", ATTR{disable}="1"
   '';
   boot.initrd.services.udev.rules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0b05", ATTR{idProduct}=="1939", ATTR{authorized}="0"
+    ACTION=="add", KERNEL=="usb1-port6", ATTR{early_stop}="yes", ATTR{disable}="1"
   '';
 
   system.stateVersion = "25.11";
