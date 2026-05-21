@@ -160,14 +160,16 @@ in
         predefinedScheme = "Oxocarbon";
       };
 
-      # Idle pipeline: DPMS off → lock → suspend. Timeouts are absolute (each
-      # measured from the last input event), not additive — so lock fires 30
-      # min after idle started, not 30 min after the screen turned off.
+      # Idle pipeline: DPMS off → lock. Suspend is disabled — machine stays
+      # awake until shutdown. Timeouts are absolute (each measured from the
+      # last input event), not additive — so lock fires 30 min after idle
+      # started, not 30 min after the screen turned off. 0 = stage disabled
+      # (see Services/Power/IdleService.qml).
       idle = {
         enabled = true;
         screenOffTimeout = 15 * 60;
         lockTimeout = 30 * 60;
-        suspendTimeout = 2 * 60 * 60;
+        suspendTimeout = 0;
       };
 
       # Override the session menu's logout action.
