@@ -58,7 +58,14 @@
   # Wayland instead of falling back to XWayland. Affects Slack, Chrome, VS Code,
   # Discord, and other Electron apps — measurably faster cold starts plus proper
   # GPU acceleration.
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    # GStreamer's plugin loader doesn't auto-discover the NixOS profile path.
+    # User-launched apps (Tauri/webkit2gtk, OBS, etc.) need this pointed at the
+    # aggregated plugin dir or `appsink`/`libav` won't resolve at runtime even
+    # though the .so files exist under /run/current-system/sw.
+    GST_PLUGIN_SYSTEM_PATH_1_0 = "/run/current-system/sw/lib/gstreamer-1.0";
+  };
 
   # Pull in `linux-firmware`, which carries the closed-source-but-redistributable
   # blobs required by USB BT dongles (e.g. TP-Link UB500 → rtl_bt/rtl8761bu_fw.bin),
@@ -125,6 +132,7 @@
     wget
     libnotify
     unzip
+    gst_all_1.gstreamer        # gst-inspect-1.0, gst-launch-1.0 for diagnostics
     gst_all_1.gst-plugins-base
     gst_all_1.gst-plugins-good
     gst_all_1.gst-libav
