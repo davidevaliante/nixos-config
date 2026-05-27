@@ -63,6 +63,13 @@
       flake = false;
     };
 
+    # Third-party noctalia plugin. Pinned to master via the flake lock so a
+    # `nix flake update` is a deliberate bump.
+    noctalia-clipper = {
+      url = "github:blackbartblues/noctalia-clipper";
+      flake = false;
+    };
+
     # Source for libprng — the cgo shared library that game-service links
     # against. Private AWS CodeCommit repo, so flake eval requires SSH/AWS
     # credentials (the lockfile only stores a commit hash, no creds).
