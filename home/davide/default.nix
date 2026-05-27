@@ -135,6 +135,7 @@ in
 
     authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
     localsend       # cross-platform LAN file transfer with Android
+    libreoffice-fresh
   ]) ++ [ apidog-launch ];
 
   home.sessionVariables = {
@@ -155,6 +156,15 @@ in
       "x-scheme-handler/unknown" = "google-chrome.desktop";
       "x-scheme-handler/apidog" = "apidog.desktop";
       "inode/directory" = "thunar.desktop";
+
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "writer.desktop";
+      "application/msword" = "writer.desktop";
+      "application/vnd.oasis.opendocument.text" = "writer.desktop";
+
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "calc.desktop";
+      "application/vnd.ms-excel" = "calc.desktop";
+      "application/vnd.oasis.opendocument.spreadsheet" = "calc.desktop";
+      "text/csv" = "calc.desktop";
     };
   };
 
