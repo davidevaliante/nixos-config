@@ -31,6 +31,11 @@ let
       type = "command";
       command = "bash /home/davide/.claude/statusline-command.sh";
     };
+
+    attribution = {
+      commit = "";
+      pr = "";
+    };
   };
 
   statuslineScript = ''
