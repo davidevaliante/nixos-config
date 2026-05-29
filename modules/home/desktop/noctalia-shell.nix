@@ -56,6 +56,18 @@ let
     fi
   '';
 
+  # slurp prints the selection geometry; we format it human-readably, copy
+  # to the Wayland clipboard, and surface it as a notification so the user
+  # can read the dimensions without looking at a terminal. ESC during the
+  # drag makes slurp exit non-zero — `|| exit 0` swallows that quietly.
+  pixelMeasure = pkgs.writeShellScriptBin "pixel-measure" ''
+    set -u
+    geom=$(${pkgs.slurp}/bin/slurp -f '%wx%h @ %x,%y' 2>/dev/null) || exit 0
+    [ -n "$geom" ] || exit 0
+    printf '%s' "$geom" | ${pkgs.wl-clipboard}/bin/wl-copy
+    ${pkgs.libnotify}/bin/notify-send "Region measured" "$geom"
+  '';
+
   noctaliaReload = pkgs.writeShellScriptBin "noctalia-reload" ''
     set -eu
     # The nix wrapper renames the process to `.quickshell-wra`, so we match
@@ -135,6 +147,7 @@ in
         { id = "NotificationHistory"; }
         { id = "plugin:lens-search"; }
         { id = "plugin:color-picker"; }
+        { id = "plugin:pixel-measure"; }
         {
           id = "VPN";
           displayMode = "alwaysShow"; # always show the pill, not just on hover
@@ -264,6 +277,10 @@ in
           enabled = true;
           sourceUrl = "local";
         };
+        pixel-measure = {
+          enabled = true;
+          sourceUrl = "local";
+        };
         clipper = {
           enabled = true;
           sourceUrl = "https://github.com/blackbartblues/noctalia-clipper";
@@ -295,6 +312,11 @@ in
     recursive = true;
   };
 
+  xdg.configFile."noctalia/plugins/pixel-measure" = lib.mkIf active {
+    source = ./noctalia/plugins/pixel-measure;
+    recursive = true;
+  };
+
   xdg.configFile."noctalia/plugins/clipper" = lib.mkIf active {
     source = inputs.noctalia-clipper.outPath;
     recursive = true;
@@ -308,7 +330,9 @@ in
     noctaliaReload
     lensSearch
     colorPick
+    pixelMeasure
     pkgs.hyprpicker
+    pkgs.wl-clipboard
   ];
 
   # Surface the helper scripts in fuzzel (and any other XDG launcher) so the
@@ -328,6 +352,14 @@ in
       comment = "Pick a pixel color from the screen";
       exec = "color-pick";
       icon = "color-picker";
+      terminal = false;
+      categories = [ "Utility" "Graphics" ];
+    };
+    pixel-measure = {
+      name = "Pixel Measure";
+      comment = "Measure a screen region in pixels";
+      exec = "pixel-measure";
+      icon = "measure";
       terminal = false;
       categories = [ "Utility" "Graphics" ];
     };

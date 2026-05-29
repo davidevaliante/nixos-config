@@ -108,6 +108,7 @@ in
     ../../modules/home/programs/obs.nix
     ../../modules/home/programs/claude-code.nix
     ../../modules/home/programs/openhuman.nix
+    ../../modules/home/programs/thunar.nix
     ../../modules/home/xdg-cleanup.nix
     ../../modules/home/desktop
   ];

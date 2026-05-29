@@ -1,0 +1,11 @@
+{
+  "id": "pixel-measure",
+  "name": "Pixel Measure",
+  "version": "1.0.0",
+  "author": "davide",
+  "description": "Drag a screen region with slurp; pixel dimensions are copied to clipboard and shown in a notification.",
+  "tags": ["Bar", "Utility"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}

@@ -17,6 +17,10 @@
     file-roller
     zip
     p7zip
+    # Backing tool for the "Copy path" custom action in modules/home/programs/thunar.nix.
+    # Coupled here so it ships under both Niri and Hyprland (only Hyprland's
+    # desktop module otherwise pulls it in).
+    wl-clipboard
   ];
 
   # Trash, network shares (smb://, sftp://), and similar live in gvfs daemons —
