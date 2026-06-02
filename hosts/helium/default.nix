@@ -22,6 +22,7 @@
     ../../modules/nixos/thunar.nix
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/nvidia.nix
+    ../../modules/nixos/steam.nix
     ../../modules/nixos/cosmo.nix
   ];
 
