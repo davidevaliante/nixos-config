@@ -283,15 +283,15 @@ in
         };
         clipper = {
           enabled = true;
-          sourceUrl = "https://github.com/blackbartblues/noctalia-clipper";
+          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
         };
       };
     };
   };
 
-  # Ship plugins from three sources: the upstream noctalia-plugins flake
-  # input (keybind-cheatsheet), the third-party clipper input, and locally
-  # authored plugins under ./noctalia/plugins (lens-search, color-picker).
+  # Ship plugins from two sources: the upstream noctalia-plugins flake input
+  # (keybind-cheatsheet, clipper) and locally authored plugins under
+  # ./noctalia/plugins (lens-search, color-picker, pixel-measure).
   # `recursive = true` keeps the plugin directory a real, writable folder
   # (each file inside is its own symlink) so noctalia can persist per-plugin
   # settings.json. With a single dir-level symlink to the read-only store,
@@ -318,7 +318,7 @@ in
   };
 
   xdg.configFile."noctalia/plugins/clipper" = lib.mkIf active {
-    source = inputs.noctalia-clipper.outPath;
+    source = "${inputs.noctalia-plugins}/clipper";
     recursive = true;
   };
 

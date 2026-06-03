@@ -344,43 +344,27 @@
         "noctalia-qs": "noctalia-qs"
       },
       "locked": {
-        "lastModified": 1777253304,
-        "narHash": "sha256-XqSHEKEW5pSAx9MoMo8mKPgkjoy4FEhZ4x0a6hGYrSI=",
+        "lastModified": 1780371321,
+        "narHash": "sha256-WCaU6npdMdjZSZHe3XATNDFijmzRnsV8V+iR80e5deg=",
         "owner": "noctalia-dev",
         "repo": "noctalia-shell",
-        "rev": "6773c4750a12c9e9af9c4ce2365e083f1d0d0ad8",
+        "rev": "3aab45a2f34fd47666b05892b95054952e788de1",
         "type": "github"
       },
       "original": {
         "owner": "noctalia-dev",
         "repo": "noctalia-shell",
-        "type": "github"
-      }
-    },
-    "noctalia-clipper": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1770581711,
-        "narHash": "sha256-8fiyBFgS2diCr8UzmJLLRRXNCCgnzMsH0r05r89Gdzc=",
-        "owner": "blackbartblues",
-        "repo": "noctalia-clipper",
-        "rev": "0c38dc729d41e8f25424a179a24c996d83bb1ae2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "blackbartblues",
-        "repo": "noctalia-clipper",
         "type": "github"
       }
     },
     "noctalia-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1778520650,
-        "narHash": "sha256-oO+Ges2P2srFizciaOO2nb1K8Jd2+OP8clH2q1mBcGE=",
+        "lastModified": 1780434670,
+        "narHash": "sha256-JN9pkv6s8cZLDT1x9V176ixrwxtafzxgYuSevEznxro=",
         "owner": "noctalia-dev",
         "repo": "noctalia-plugins",
-        "rev": "1aee0f4ea79a2f34b2d8039509e367ade62ad95d",
+        "rev": "3d190038f23687e37c7fa73f29c63682902f5887",
         "type": "github"
       },
       "original": {
@@ -399,11 +383,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1777167795,
-        "narHash": "sha256-VHdtmxVX7oF2+FxYQQPARQmtaHw23FoTBiTaH6ucOEg=",
+        "lastModified": 1780194487,
+        "narHash": "sha256-M+YtjKCTkHrkplNaKVyaxfa8hAWjRF6wFOUBAZvxQ4U=",
         "owner": "noctalia-dev",
         "repo": "noctalia-qs",
-        "rev": "697db4c14e27d841956ff76887fc312443e6fb17",
+        "rev": "07398e12b54f194e3a2d47c87e3fd10b8eeaa27d",
         "type": "github"
       },
       "original": {
@@ -465,7 +449,6 @@
         "nixpkgs-opentofu": "nixpkgs-opentofu",
         "nixpkgs-stable": "nixpkgs-stable_2",
         "noctalia": "noctalia",
-        "noctalia-clipper": "noctalia-clipper",
         "noctalia-plugins": "noctalia-plugins",
         "prng": "prng",
         "sops-nix": "sops-nix",
