@@ -192,7 +192,5 @@ in
 
   programs.home-manager.enable = true;
 
-  gtk.gtk4.theme = null;
-
   home.stateVersion = "25.11";
 }
