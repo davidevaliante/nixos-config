@@ -21,6 +21,7 @@ in
     enable = true;
     xwayland.enable = true;
     systemd.enable = true;
+    configType = "hyprlang";
 
     settings = {
       monitor = [ ",preferred,auto,1" ];

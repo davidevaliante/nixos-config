@@ -4,18 +4,18 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "*" = {
-        addKeysToAgent = "yes";
-        forwardAgent = false;
-        compression = false;
-        serverAliveInterval = 0;
-        serverAliveCountMax = 3;
-        hashKnownHosts = false;
-        userKnownHostsFile = "~/.ssh/known_hosts";
-        controlMaster = "no";
-        controlPath = "~/.ssh/master-%r@%n:%p";
-        controlPersist = "no";
+        AddKeysToAgent = "yes";
+        ForwardAgent = false;
+        Compression = false;
+        ServerAliveInterval = 0;
+        ServerAliveCountMax = 3;
+        HashKnownHosts = false;
+        UserKnownHostsFile = "~/.ssh/known_hosts";
+        ControlMaster = "no";
+        ControlPath = "~/.ssh/master-%r@%n:%p";
+        ControlPersist = "no";
       };
 
       # NOTE: original config had `StrictHostKeyChecking no` floating between
@@ -23,64 +23,64 @@
       # *previous* Host (github.com) — preserved here. Move to "*" if you
       # actually wanted it globally.
       "github.com" = {
-        hostname = "github.com";
-        user = "davide";
-        identityFile = "~/.ssh/github";
-        extraOptions.StrictHostKeyChecking = "no";
+        HostName = "github.com";
+        User = "davide";
+        IdentityFile = "~/.ssh/github";
+        StrictHostKeyChecking = "no";
       };
 
       "git-codecommit.*.amazonaws.com" = {
-        user = "APKA2MJV4RLTQ464ZMYR";
-        identityFile = "~/.ssh/id_rsa";
-        port = 22;
+        User = "APKA2MJV4RLTQ464ZMYR";
+        IdentityFile = "~/.ssh/id_rsa";
+        Port = 22;
         # OpenSSH 10 warns on every connection that the session isn't using a
         # post-quantum KEX ("store now, decrypt later"). AWS CodeCommit doesn't
         # support hybrid PQ KEX yet, so the fallback is unavoidable until they
         # upgrade. Suppress the noise for this host only — auth via SSH keys is
         # unaffected; the warning is purely about session confidentiality.
-        extraOptions.LogLevel = "ERROR";
+        LogLevel = "ERROR";
       };
 
       "btcnode" = {
-        hostname = "188.166.162.173";
-        user = "root";
-        identityFile = "~/.ssh/digital_ocean";
+        HostName = "188.166.162.173";
+        User = "root";
+        IdentityFile = "~/.ssh/digital_ocean";
       };
 
       "spikeslot.com" = {
-        hostname = "167.172.160.39";
-        user = "root";
-        identityFile = "~/.ssh/digital_ocean";
+        HostName = "167.172.160.39";
+        User = "root";
+        IdentityFile = "~/.ssh/digital_ocean";
       };
 
       "scraper-bots" = {
-        hostname = "134.209.233.135";
-        user = "davide";
-        identityFile = "~/.ssh/id_rsa";
+        HostName = "134.209.233.135";
+        User = "davide";
+        IdentityFile = "~/.ssh/id_rsa";
       };
 
       "bonus-services" = {
-        hostname = "142.93.172.145";
-        user = "davide";
-        identityFile = "~/.ssh/id_rsa";
+        HostName = "142.93.172.145";
+        User = "davide";
+        IdentityFile = "~/.ssh/id_rsa";
       };
 
       "tg-strapi" = {
-        hostname = "strapi.tgutils.com";
-        user = "ubuntu";
-        identityFile = "~/.ssh/tg-strapi-ec2.pem";
+        HostName = "strapi.tgutils.com";
+        User = "ubuntu";
+        IdentityFile = "~/.ssh/tg-strapi-ec2.pem";
       };
 
       "cosmo-dev" = {
-        hostname = "88.99.251.222";
-        user = "root";
-        identityFile = "~/.ssh/cosmo-dev";
+        HostName = "88.99.251.222";
+        User = "root";
+        IdentityFile = "~/.ssh/cosmo-dev";
       };
 
       "vods-prod" = {
-        hostname = "ec2-18-197-17-224.eu-central-1.compute.amazonaws.com";
-        user = "ubuntu";
-        identityFile = "~/.ssh/vods-prod.pem";
+        HostName = "ec2-18-197-17-224.eu-central-1.compute.amazonaws.com";
+        User = "ubuntu";
+        IdentityFile = "~/.ssh/vods-prod.pem";
       };
     };
   };

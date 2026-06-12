@@ -33,6 +33,17 @@ in
       font_family = lib.mkForce "0xProto Nerd Font Mono";
 
       # ── Behaviour ──
+      # Disable kitty's config auto-reload watcher. It spawns a long-lived
+      # `kitten __watch_conf__` that recursively watches the config paths;
+      # because our kitty.conf is a symlink into the immutable
+      # /nix/store/...home-manager-files tree, the watcher leaks inotify
+      # watches until it drains the entire fs.inotify.max_user_watches pool
+      # (~524k), which then starves systemd of cgroup watches and floods the
+      # journal with "Failed to add control inotify watch descriptor ... No
+      # space left on device" for every new kitty/app scope. Auto-reload is
+      # useless here anyway — config only changes via rebuild + restart.
+      # Negative value disables the watcher entirely.
+      auto_reload_config = -1;
       enable_audio_bell = false;
       confirm_os_window_close = 0;
       hide_window_decorations = "yes";
