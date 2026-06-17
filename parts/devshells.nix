@@ -232,6 +232,13 @@
           '';
         };
 
+        # shell for TG backoffice to allow portforwarding
+        tg-backoffice = pkgs.mkShell {
+          packages = with pkgs; [
+            lsof
+          ];
+        };
+
         # Shells for topgaming/eks — one per environment. Each pins the same
         # toolchain (aws/kubectl/tofu/eksctl) but binds an AWS profile, an
         # EKS context, and the matching OpenVPN connection together so a

@@ -17,6 +17,18 @@ in
   stylix.targets.hyprpaper.enable = lib.mkForce false;
   services.hyprpaper.enable = lib.mkForce false;
 
+  # The Hyprland HM module auto-exports NIX_XDG_DESKTOP_PORTAL_DIR pointing at
+  # this user profile's portals dir, which contains ONLY hyprland.portal. Under
+  # niri that leaves xdg-desktop-portal with no ScreenCast backend (gnome), so
+  # Google Meet / OBS screen-share silently fails (the ScreenCast D-Bus
+  # interface never appears). Force it to the system profile, which carries
+  # gnome/gtk/hyprland together — correct for both compositors. mkForce because
+  # the HM module already defines this var. (The NixOS-level setting in
+  # modules/nixos/portal.nix is shadowed by HM's session vars, so the effective
+  # fix has to live here.)
+  home.sessionVariables.NIX_XDG_DESKTOP_PORTAL_DIR =
+    lib.mkForce "/run/current-system/sw/share/xdg-desktop-portal/portals";
+
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;

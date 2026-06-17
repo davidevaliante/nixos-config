@@ -9,6 +9,7 @@
     ./niri-window-switcher.nix
     ./niri-workspace-rename.nix
     ./clipboard-picker.nix
+    ./screenshare-reload.nix
     ./waybar.nix
     ./swaync.nix
     ./fuzzel.nix

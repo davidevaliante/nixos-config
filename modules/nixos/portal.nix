@@ -3,8 +3,15 @@
 {
   # home-manager sets NIX_XDG_DESKTOP_PORTAL_DIR to its per-user profile, which
   # only contains hyprland.portal — under niri that leaves the ScreenCast
-  # interface unresolved and OBS shows "no capture sources". Point it at the
-  # system profile, which carries the full set (gnome/gtk/hyprland/gnome-keyring).
+  # interface unresolved and OBS/Google Meet show "no capture sources". Point it
+  # at the system profile, which carries the full set
+  # (gnome/gtk/hyprland/gnome-keyring).
+  #
+  # NOTE: this NixOS-level value is SHADOWED by home-manager's session vars at
+  # login (the HM Hyprland module re-exports the var to the per-user profile), so
+  # the *effective* override lives in modules/home/desktop/hyprland.nix via
+  # `home.sessionVariables ... lib.mkForce`. This is kept as a fallback for
+  # root/non-HM shells.
   environment.sessionVariables.NIX_XDG_DESKTOP_PORTAL_DIR =
     "/run/current-system/sw/share/xdg-desktop-portal/portals";
 
