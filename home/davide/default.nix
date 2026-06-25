@@ -137,6 +137,8 @@ in
     authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
     localsend       # cross-platform LAN file transfer with Android
     libreoffice-fresh
+
+    dirb            # web content / directory brute-forcer
   ]) ++ [ apidog-launch ];
 
   home.sessionVariables = {
