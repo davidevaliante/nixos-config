@@ -10,8 +10,12 @@
   environment.systemPackages = [
     (pkgs.lutris.override {
       extraPkgs = pkgs: [
-        # RO's client is 32-bit; wineWow provides both 32- and 64-bit wine.
-        pkgs.wineWowPackages.stable
+        # RO's client is 32-bit. wineWow64 is Wine's "new WoW64": a 64-bit
+        # build that runs 32-bit Windows apps without a separate 32-bit host
+        # build. Upstream deprecated the old multilib wineWowPackages in its
+        # favor. If uaRO ever misbehaves under new-WoW64, fall back to
+        # Lutris's own downloaded wine-ge runner per game.
+        pkgs.wineWow64Packages.stable
         pkgs.winetricks
       ];
     })
