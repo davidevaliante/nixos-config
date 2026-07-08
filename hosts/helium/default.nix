@@ -23,6 +23,7 @@
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/nvidia.nix
     ../../modules/nixos/steam.nix
+    ../../modules/nixos/lutris.nix
     ../../modules/nixos/cosmo.nix
   ];
 
