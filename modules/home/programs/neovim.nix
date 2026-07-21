@@ -1,11 +1,5 @@
-{ pkgs, lib, inputs, ... }:
+{ pkgs, lib, ... }:
 
-let
-  pkgsStable = import inputs.nixpkgs-stable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
-in
 {
   # Stylix's neovim target writes a base16 theme into ~/.config/nvim/init.lua,
   # which fights a hand-curated lua config. We theme nvim from inside the lua
@@ -16,10 +10,10 @@ in
   # with the user's own ~/.config/nvim/init.lua. Install nvim as a plain package
   # plus everything the lua config + plugins expect at runtime.
   #
-  # Neovim is pinned to the 25.11 release (0.11.x). Unstable has 0.12 which
-  # introduced breaking treesitter API changes that nvim-treesitter master
-  # hasn't caught up with yet.
-  home.packages = [ pkgsStable.neovim ] ++ (with pkgs; [
+  # Tracks nixpkgs unstable (currently neovim 0.12.x). Previously pinned to the
+  # 25.11 release for 0.11.x because 0.12 broke nvim-treesitter master's API;
+  # that has since been resolved.
+  home.packages = [ pkgs.neovim ] ++ (with pkgs; [
 
     # ── Build deps for tree-sitter parser compilation & native plugins ──
     gcc

@@ -4,10 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Pinned to grab packages that broke on unstable. Currently used for
-    # neovim — 0.12 in unstable broke nvim-treesitter master's API.
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
-
     # Pinned to a commit that ships kubectl 1.32.3. Cluster work needs a
     # specific kubectl minor (skew rules); current nixpkgs ships 1.35.x.
     nixpkgs-kubectl.url = "github:NixOS/nixpkgs/ebe4301cbd8f81c4f8d3244b3632338bbeb6d49c";

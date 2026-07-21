@@ -20,6 +20,7 @@
     ../../modules/nixos/openvpn.nix
     ../../modules/nixos/localsend.nix
     ../../modules/nixos/thunar.nix
+    ../../modules/nixos/keyd.nix
     ../../modules/nixos/portal.nix
     ../../modules/nixos/graphics/nvidia.nix
     ../../modules/nixos/steam.nix
