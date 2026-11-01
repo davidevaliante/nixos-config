@@ -104,7 +104,6 @@ in
       exec-once = [
         "${pkgs.awww}/bin/awww-daemon"
         "sleep 1 && ${pkgs.awww}/bin/awww img ${osConfig.stylix.image}"
-        "systemctl --user start hyprpolkitagent"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
       ];
@@ -124,15 +123,7 @@ in
     playerctl
   ];
 
-  systemd.user.services.hyprpolkitagent = {
-    Unit = {
-      Description = "Hyprland Polkit Agent";
-      PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
-    };
-    Service = {
-      ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
-      Restart = "on-failure";
-    };
-  };
+  # Polkit GUI prompts are handled by noctalia's native agent
+  # (`programs.noctalia.settings.shell.polkit_agent`); hyprpolkitagent was
+  # removed because its 0.2.0 rewrite SIGABRTs on startup under niri.
 }

@@ -40,6 +40,13 @@
       bindkey '^[[B' history-substring-search-down
       bindkey '^P' history-substring-search-up
       bindkey '^N' history-substring-search-down
+
+      # Edit the current command line in $EDITOR (nvim). Ctrl-X Ctrl-E in
+      # insert mode, or `v` in vi command mode (the classic vi binding).
+      autoload -Uz edit-command-line
+      zle -N edit-command-line
+      bindkey -M viins '^X^E' edit-command-line
+      bindkey -M vicmd 'v'    edit-command-line
     '';
   };
 }

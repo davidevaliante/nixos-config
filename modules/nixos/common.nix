@@ -132,6 +132,7 @@
     wget
     libnotify
     unzip
+    jq
     gst_all_1.gstreamer        # gst-inspect-1.0, gst-launch-1.0 for diagnostics
     gst_all_1.gst-plugins-base
     gst_all_1.gst-plugins-good

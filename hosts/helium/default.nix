@@ -58,6 +58,18 @@
 
   networking.hostName = "helium";
 
+  # Override the wired NIC's MAC with a fixed locally-administered address
+  # (02: prefix = LAA unicast, so it can't collide with a real vendor OUI).
+  # A systemd .link unit is applied by systemd-udevd's net_setup_link builtin
+  # regardless of whether systemd-networkd is running, so this works under
+  # NetworkManager (NM's ethernet cloned-mac default is "preserve", keeping
+  # the link-assigned MAC). Matched by PermanentMACAddress so an interface
+  # rename can't detach the override.
+  systemd.network.links."10-enp7s0" = {
+    matchConfig.PermanentMACAddress = "f0:2f:74:cb:43:d3";
+    linkConfig.MACAddress = "02:A1:B2:C3:D4:E5";
+  };
+
   # The desk mouse on helium reports very high counts-per-inch; slow it
   # down at the libinput layer so X11/Xwayland clients match the Wayland
   # compositor settings (Hyprland/Niri set their own accel-speed too).

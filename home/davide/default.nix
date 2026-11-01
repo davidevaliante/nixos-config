@@ -104,9 +104,11 @@ in
     ../../modules/home/programs/opentofu.nix
     ../../modules/home/programs/kubeconfig.nix
     ../../modules/home/programs/tg-prod-push.nix
+    ../../modules/home/programs/git-prepush-slack.nix
     ../../modules/home/programs/bootstrap.nix
     ../../modules/home/programs/obs.nix
     ../../modules/home/programs/claude-code.nix
+    ../../modules/home/programs/codex.nix
     ../../modules/home/programs/openhuman.nix
     ../../modules/home/programs/thunar.nix
     ../../modules/home/programs/uaro.nix

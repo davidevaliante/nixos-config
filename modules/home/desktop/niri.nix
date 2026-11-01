@@ -82,7 +82,6 @@ in
       { command = [ "sh" "-c" "sleep 1 && ${pkgs.awww}/bin/awww img ${osConfig.stylix.image}" ]; }
       { command = [ "wl-paste" "--type" "text" "--watch" "cliphist" "store" ]; }
       { command = [ "wl-paste" "--type" "image" "--watch" "cliphist" "store" ]; }
-      { command = [ "systemctl" "--user" "start" "hyprpolkitagent" ]; }
     ];
   };
 }

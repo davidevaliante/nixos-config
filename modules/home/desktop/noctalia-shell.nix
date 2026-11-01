@@ -10,21 +10,6 @@ let
   cfg = config.mySystem.desktop;
   active = cfg.shell == "noctalia";
 
-  # The keybind-cheatsheet plugin parses the niri/hyprland config once and
-  # caches the result in its plugin settings.json forever — new binds added
-  # later don't appear until that cache is cleared and the shell restarts.
-  # `noctalia-reload` does both, and `home.activation` wipes the cache on
-  # every HM rebuild so the next shell start always re-parses.
-  cheatsheetCache = "$HOME/.config/noctalia/plugins/keybind-cheatsheet/settings.json";
-
-  # Qt persists compiled QML bytecode here, keyed by file path. Plugins
-  # symlinked from /nix/store change content on every rebuild but keep the
-  # same ~/.config path — so Qt happily serves stale bytecode and ignores
-  # property changes (e.g. an updated `icon:` string renders as the
-  # default-fallback skull). Wipe the cache on every reload and rebuild so
-  # the new sources actually take effect.
-  qmlCacheDir = "$HOME/.cache/noctalia-qs/qmlcache";
-
   # Region screenshot → Litterbox (1h temp host) → Google Lens by URL.
   # Lens has no public unauthenticated upload endpoint that's stable from a
   # shell client, so we round-trip through a temp host the same way
@@ -68,264 +53,129 @@ let
     ${pkgs.libnotify}/bin/notify-send "Region measured" "$geom"
   '';
 
+  # noctalia 5.x is a native binary (mainProgram `noctalia`) and hot-reloads
+  # its TOML config via inotify, so an HM rebuild no longer needs a restart to
+  # pick up config changes. This is a convenience helper for the rare case a
+  # full restart is wanted (e.g. after a package bump). makeWrapper execs the
+  # real binary as `.noctalia-wrapped`, so we match both the wrapper and the
+  # wrapped process.
   noctaliaReload = pkgs.writeShellScriptBin "noctalia-reload" ''
-    set -eu
-    # The nix wrapper renames the process to `.quickshell-wra`, so we match
-    # by full command line against the bin path instead of process name.
-    pid=$(${pkgs.procps}/bin/pgrep -f '/bin/quickshell$' || true)
-    if [ -n "$pid" ]; then
-      kill "$pid" || true
-      for _ in 1 2 3 4 5; do
-        kill -0 "$pid" 2>/dev/null || break
-        sleep 0.2
-      done
-    fi
-    if [ -f "${cheatsheetCache}" ]; then
-      ${pkgs.jq}/bin/jq '.cheatsheetData = [] | .detectedCompositor = ""' \
-        "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
-        && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
-    fi
-    rm -rf "${qmlCacheDir}"
-    setsid noctalia-shell </dev/null >/dev/null 2>&1 &
+    set -u
+    ${pkgs.procps}/bin/pkill -x noctalia 2>/dev/null || true
+    ${pkgs.procps}/bin/pkill -x .noctalia-wrapp 2>/dev/null || true
+    for _ in 1 2 3 4 5; do
+      ${pkgs.procps}/bin/pgrep -x noctalia >/dev/null 2>&1 || break
+      sleep 0.2
+    done
+    setsid noctalia </dev/null >/dev/null 2>&1 &
   '';
 in
 {
   imports = [ inputs.noctalia.homeModules.default ];
 
-  programs.noctalia-shell = lib.mkIf active {
+  # noctalia 5.x rewrote its config as a validated TOML stack (`config.toml`),
+  # dropped the declarative `plugins` option (plugins are now Luau and managed
+  # at runtime via `noctalia msg plugins …`), and moved theming into the
+  # stylix target. We therefore let stylix drive the palette/mode/font/opacity
+  # (see modules/noctalia/hm.nix in the stylix input, which auto-activates once
+  # this module is imported) and only set the handful of behavioural keys that
+  # aren't theme-derived. `checkConfig` (default true) runs `noctalia config
+  # validate` at build time, so an unknown key fails the build rather than
+  # silently no-op'ing at runtime.
+  programs.noctalia = lib.mkIf active {
     enable = true;
 
-    # Patch Quickshell.Bluetooth's defaultAdapter binding to recover from
-    # USB hot-unplug / re-enumerate. Upstream's `Bluetooth.defaultAdapter`
-    # doesn't reliably re-fire `defaultAdapterChanged` for the replacement
-    # BlueZ object when a Bluetooth USB dongle is re-plugged (even on the
-    # same port) — the QML binding stays pinned to the now-dead adapter
-    # and the panel toggle becomes unresponsive until the shell is
-    # restarted via `noctalia-reload`. Fall back to scanning the live
-    # `Bluetooth.adapters` list every 2s so the UI rebinds automatically.
-    package =
-      let
-        upstream = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      in
-      upstream.overrideAttrs (old: {
-        # `installPhase` in noctalia's package.nix is custom and doesn't
-        # `runHook postInstall`, so we patch the source tree pre-install
-        # via `postPatch` instead.
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace Services/Networking/BluetoothService.qml \
-            --replace-fail \
-              'readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter' \
-              'property int _adapterRebindTick: 0
-          readonly property BluetoothAdapter adapter: {
-            _adapterRebindTick;
-            if (Bluetooth.defaultAdapter) return Bluetooth.defaultAdapter;
-            if (Bluetooth.adapters && Bluetooth.adapters.values && Bluetooth.adapters.values.length > 0)
-              return Bluetooth.adapters.values[0];
-            return null;
-          }
-          Timer {
-            id: adapterRebindTimer
-            interval: 2000
-            repeat: true
-            running: true
-            onTriggered: root._adapterRebindTick += 1
-          }'
-        '';
-      });
-
     settings = {
-      # `useSeparateOpacity` decouples the bar's opacity from
-      # `ui.panelBackgroundOpacity` (which stylix forces to 1.0 to keep
-      # popups readable). Without this flag, `bar.backgroundOpacity` is
-      # silently ignored and the bar inherits the panel opacity.
-      bar.useSeparateOpacity = lib.mkForce true;
-      bar.backgroundOpacity = lib.mkForce 0.0;
-      # VPN isn't in the default right-widget list; adding it surfaces the
-      # NetworkManager VPN toggle next to Tray/NotificationHistory.
-      bar.widgets.right = lib.mkForce [
-        { id = "Tray"; }
-        { id = "NotificationHistory"; }
-        { id = "plugin:lens-search"; }
-        { id = "plugin:color-picker"; }
-        { id = "plugin:pixel-measure"; }
-        {
-          id = "VPN";
-          displayMode = "alwaysShow"; # always show the pill, not just on hover
-          iconColor = "tertiary"; # purple in Oxocarbon
-          textColor = "tertiary";
-        }
-        { id = "Battery"; }
-        { id = "Volume"; }
-        { id = "Bluetooth"; }
-        { id = "Brightness"; }
-        { id = "ControlCenter"; }
-      ];
-      notifications = {
-        location = "bottom_right";
-        density = "compact";
-        lowUrgencyDuration = 2;
-        normalUrgencyDuration = 5;
-        criticalUrgencyDuration = 10;
-      };
-      ui.fontDefault = lib.mkForce "0xProto Nerd Font";
-      colorSchemes = {
-        useWallpaperColors = false;
-        predefinedScheme = "Oxocarbon";
+      # Force 0xProto Nerd Font. Stylix's noctalia target sets
+      # `shell.font_family` to its sans-serif (Inter); mkForce wins so the shell
+      # always uses 0xProto regardless of the active stylix theme.
+      shell.font_family = lib.mkForce "0xProto Nerd Font";
+
+      # Use noctalia's built-in polkit authentication agent for GUI privilege
+      # prompts. Replaces hyprpolkitagent, whose 0.2.0 (hyprtoolkit/OpenGL)
+      # rewrite SIGABRTs on startup under niri. noctalia is our shell under both
+      # niri and Hyprland, so its native agent covers both.
+      shell.polkit_agent = true;
+
+      # Fully transparent bar background. v5 dropped v4's `useSeparateOpacity`
+      # flag — the bar opacity is now always independent of panel opacity, so
+      # this single key is all that's needed.
+      bar.main = {
+        background_opacity = 0.0;
+        # Per-widget "capsule" — the grey rounded pill behind each widget that
+        # keeps icons readable over a transparent bar (the v4 look). v5 defaults
+        # it off, so re-enable it; fill/opacity use the theme's surface role, so
+        # it follows stylix.
+        capsule = true;
+        # Right-hand widget section. v5 widget ids are plain lowercase strings
+        # (no `{ id = …; }` objects, no `plugin:` prefix). `clipboard` is v5's
+        # built-in clipboard history (replaces the old `clipper` plugin) and
+        # `network` carries the VPN indicator (there is no standalone VPN
+        # widget anymore — see [widget.network] below).
+        end = [
+          "tray"
+          "notifications"
+          "clipboard"
+          "network"
+          "battery"
+          "volume"
+          "bluetooth"
+          "brightness"
+          "control-center"
+          "session"
+        ];
       };
 
-      # Idle pipeline: DPMS off → lock. Suspend is disabled — machine stays
-      # awake until shutdown. Timeouts are absolute (each measured from the
-      # last input event), not additive — so lock fires 30 min after idle
-      # started, not 30 min after the screen turned off. 0 = stage disabled
-      # (see Services/Power/IdleService.qml).
-      idle = {
-        enabled = true;
-        screenOffTimeout = 15 * 60;
-        lockTimeout = 30 * 60;
-        suspendTimeout = 0;
+      # Panel placement. v5 dropped v4's `useSeparateOpacity`, so an *attached*
+      # panel inherits the bar's `background_opacity` — with our transparent bar
+      # (0.0) the attached control-center/session/wallpaper panels render with a
+      # see-through background (cards keep their own color). Making them
+      # `floating` decouples them: floating panels use `transparency_mode`
+      # (`solid` → opaque). `open_near_click_*` anchors a click-opened panel to
+      # the clicked widget instead of screen/bar centre. The launcher stays
+      # floating+centred (it's keyboard-driven via Mod+Space).
+      shell.panel = {
+        control_center_placement = "floating";
+        session_placement = "floating";
+        wallpaper_placement = "floating";
+        open_near_click_control_center = true;
+        open_near_click_clipboard = true;
+        open_near_click_session = true;
+        open_near_click_wallpaper = true;
       };
 
-      # Override the session menu's logout action.
-      #
-      # Noctalia's default logout calls `loginctl terminate-session`, which kills
-      # the systemd user scope but leaves niri/Hyprland running detached — the
-      # compositor never tells the DM to reclaim the display, so GDM hangs and
-      # only a hard reboot recovers. The fix per niri/discussions/{2729,3038} is
-      # to ask the compositor to quit itself first; logind cleanup follows
-      # cleanly. We pin the full powerOptions array (entries with empty
-      # `command` fall through to noctalia's defaults) so the menu still shows
-      # every option — overriding only `logout`.
-      sessionMenu.powerOptions = lib.mkForce [
-        {
+      # Surface the NetworkManager VPN state inside the network widget. `both`
+      # shows the VPN label alongside the network label (replacing the old
+      # standalone "VPN" pill).
+      widget.network = {
+        vpn_status = "both";
+        show_vpn_label = true;
+      };
+
+      # Idle pipeline: screen off at 15 min, lock at 30 min, no suspend.
+      # v5 models each idle stage as a named `[idle.behavior.<name>]` table with
+      # its own timeout/action/enabled. Timeouts are absolute (measured from the
+      # last input event), not additive.
+      idle.behavior = {
+        "screen-off" = {
+          timeout = 15 * 60;
+          action = "screen_off";
+          enabled = true;
+        };
+        lock = {
+          timeout = 30 * 60;
           action = "lock";
           enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "suspend";
-          enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "hibernate";
-          enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "reboot";
-          enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "userspaceReboot";
-          enabled = false;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "rebootToUefi";
-          enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-        {
-          action = "logout";
-          enabled = true;
-          countdownEnabled = true;
-          command = "case $XDG_CURRENT_DESKTOP in niri) niri msg action quit -s ;; Hyprland) hyprctl dispatch exit ;; esac";
-          keybind = "";
-        }
-        {
-          action = "shutdown";
-          enabled = true;
-          countdownEnabled = true;
-          command = "";
-          keybind = "";
-        }
-      ];
-    };
-
-    plugins = {
-      version = 2;
-      sources = [
-        {
-          enabled = true;
-          name = "Noctalia Plugins";
-          url = "https://github.com/noctalia-dev/noctalia-plugins";
-        }
-      ];
-      states = {
-        keybind-cheatsheet = {
-          enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-        };
-        lens-search = {
-          enabled = true;
-          sourceUrl = "local";
-        };
-        color-picker = {
-          enabled = true;
-          sourceUrl = "local";
-        };
-        pixel-measure = {
-          enabled = true;
-          sourceUrl = "local";
-        };
-        clipper = {
-          enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
         };
       };
     };
   };
 
-  # Ship plugins from two sources: the upstream noctalia-plugins flake input
-  # (keybind-cheatsheet, clipper) and locally authored plugins under
-  # ./noctalia/plugins (lens-search, color-picker, pixel-measure).
-  # `recursive = true` keeps the plugin directory a real, writable folder
-  # (each file inside is its own symlink) so noctalia can persist per-plugin
-  # settings.json. With a single dir-level symlink to the read-only store,
-  # plugins like keybind-cheatsheet hang on "loading" because their cache
-  # write fails.
-  xdg.configFile."noctalia/plugins/keybind-cheatsheet" = lib.mkIf active {
-    source = "${inputs.noctalia-plugins}/keybind-cheatsheet";
-    recursive = true;
-  };
-
-  xdg.configFile."noctalia/plugins/lens-search" = lib.mkIf active {
-    source = ./noctalia/plugins/lens-search;
-    recursive = true;
-  };
-
-  xdg.configFile."noctalia/plugins/color-picker" = lib.mkIf active {
-    source = ./noctalia/plugins/color-picker;
-    recursive = true;
-  };
-
-  xdg.configFile."noctalia/plugins/pixel-measure" = lib.mkIf active {
-    source = ./noctalia/plugins/pixel-measure;
-    recursive = true;
-  };
-
-  xdg.configFile."noctalia/plugins/clipper" = lib.mkIf active {
-    source = "${inputs.noctalia-plugins}/clipper";
-    recursive = true;
-  };
-
-  xdg.configFile."noctalia/colorschemes/Oxocarbon/Oxocarbon.json" = lib.mkIf active {
-    source = ./noctalia/colorschemes/Oxocarbon.json;
-  };
-
+  # The lens-search / color-pick / pixel-measure utilities were bar-widget
+  # plugins in v4; v5 can't load QML plugins, so they live on as standalone
+  # shell scripts surfaced through the launcher (desktop entries below). The
+  # old keybind-cheatsheet and clipper plugins are dropped (clipboard history
+  # is now a built-in widget).
   home.packages = lib.mkIf active [
     noctaliaReload
     lensSearch
@@ -365,25 +215,11 @@ in
     };
   };
 
-  # Wipe the keybind-cheatsheet cache on every rebuild. The plugin only
-  # re-parses when this is empty, so this guarantees the next noctalia
-  # start (whether via `noctalia-reload`, logout, or reboot) picks up new
-  # binds. While noctalia is running it keeps stale data in memory — run
-  # `noctalia-reload` to refresh immediately.
-  home.activation.noctaliaCheatsheetCacheReset = lib.mkIf active (
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ -f "${cheatsheetCache}" ]; then
-        ${pkgs.jq}/bin/jq '.cheatsheetData = [] | .detectedCompositor = ""' \
-          "${cheatsheetCache}" > "${cheatsheetCache}.tmp" \
-          && mv "${cheatsheetCache}.tmp" "${cheatsheetCache}"
-      fi
-      rm -rf "${qmlCacheDir}"
-    ''
-  );
+  # Autostart. The binary is `noctalia` in v5 (v4 shipped `noctalia-shell`).
+  # Its default logout already quits the compositor natively (niri msg action
+  # quit / hyprctl dispatch exit) before falling back to loginctl, so the v4
+  # GDM-hang workaround that overrode the logout command is no longer needed.
+  wayland.windowManager.hyprland.settings.exec-once = lib.mkIf active [ "noctalia" ];
 
-  # Noctalia's home module no longer manages a systemd unit (deprecated upstream),
-  # so the shell must be launched from each compositor's autostart.
-  wayland.windowManager.hyprland.settings.exec-once = lib.mkIf active [ "noctalia-shell" ];
-
-  programs.niri.settings.spawn-at-startup = lib.mkIf active [ { command = [ "noctalia-shell" ]; } ];
+  programs.niri.settings.spawn-at-startup = lib.mkIf active [ { command = [ "noctalia" ]; } ];
 }
