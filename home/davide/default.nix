@@ -137,8 +137,9 @@ in
     rustup
 
     awscli2
+    openssl
 
-    authenticator   # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
+    authenticator  # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
     localsend       # cross-platform LAN file transfer with Android
     libreoffice-fresh
 
