@@ -26,6 +26,7 @@ let
       "Bash(air *)"
       "Bash(ls*)"
       "Read"
+      "mcp__codegraph__*" # server registered in codegraph.nix
     ];
 
     permissions.deny = [
