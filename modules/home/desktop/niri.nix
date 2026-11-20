@@ -75,6 +75,13 @@ in
         default-column-width = { fixed = 1000; };
         default-window-height = { fixed = 600; };
       }
+      {
+        # Marvel Rivals asks for borderless fullscreen, but through
+        # xwayland-satellite it arrives as a plain window and gets tiled as
+        # a half-width column. Title match keeps the launcher floating.
+        matches = [ { app-id = "^steam_app_2767030$"; title = "^Marvel Rivals"; } ];
+        open-fullscreen = true;
+      }
     ];
 
     spawn-at-startup = [

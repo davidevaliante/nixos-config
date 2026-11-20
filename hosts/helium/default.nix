@@ -26,6 +26,7 @@
     ../../modules/nixos/steam.nix
     ../../modules/nixos/lutris.nix
     ../../modules/nixos/cosmo.nix
+    ../../modules/nixos/jellyfin.nix
   ];
 
   # os-prober mounts NTFS to confirm a partition is Windows; without
