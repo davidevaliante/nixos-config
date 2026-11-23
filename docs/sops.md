@@ -65,10 +65,12 @@ scripts/sops-bootstrap.sh        # idempotent bootstrap helper
 Most useful first secret on a daily-driver: your SSH private key, so it lives
 encrypted in the repo and ends up at `~/.ssh/id_ed25519` on every host.
 
-1. **Encrypt** the existing key file as binary into a sops yaml:
+1. **Encrypt** the existing key file as binary. The output **must be JSON** —
+   sops-nix `format = "binary"` parses the file as JSON, and a YAML output fails
+   the build with `cannot parse json of ... invalid character 'd'`:
 
    ```sh
-   sops --input-type binary --output-type yaml \
+   sops --input-type binary --output-type json \
      -e ~/.ssh/id_ed25519 > secrets/common/ssh-id-ed25519.yaml
 
    # public key isn't sensitive — keep it plain
