@@ -143,6 +143,7 @@ in
     authenticator  # TOTP/HOTP codes (GNOME/libadwaita, themed via stylix)
     localsend       # cross-platform LAN file transfer with Android
     libreoffice-fresh
+    stremio-linux-shell  # on-demand streaming client (replaces the removed qt5 `stremio`)
 
     dirb            # web content / directory brute-forcer
   ]) ++ [ apidog-launch ];

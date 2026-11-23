@@ -43,5 +43,7 @@
       "ssh-tg-strapi-ec2"     = sshKey "ssh-tg-strapi-ec2-pem.yaml"    "tg-strapi-ec2.pem";
       "ssh-vods"              = sshKey "ssh-vods-pem.yaml"             "vods.pem";
       "ssh-vods-prod"         = sshKey "ssh-vods-prod-pem.yaml"        "vods-prod.pem";
+      "ssh-bastion"           = sshKey "ssh-bastion-pem.yaml"          "bastion.pem";
+      "ssh-prod-0-bastion"    = sshKey "ssh-prod-0-bastion-pem.yaml"   "prod-0_bastion.pem";
     };
 }
